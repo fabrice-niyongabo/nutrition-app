@@ -1,48 +1,77 @@
 import React from 'react';
-import {SafeAreaView, View, Text, TouchableOpacity} from 'react-native';
+import {
+  SafeAreaView,
+  View,
+  Text,
+  StatusBar,
+  ImageBackground,
+  TouchableNativeFeedback,
+} from 'react-native';
 import {StyleSheet} from 'react-native';
 import colors from '../colors';
-import Icon from 'react-native-vector-icons/dist/FontAwesome';
+import Icon from 'react-native-vector-icons/dist/Ionicons';
 const WelcomeScreen = ({navigation}) => {
   return (
     <SafeAreaView>
-      <View style={styles.headerContainer}>
-        <View style={styles.logoContainer}>
-          <Icon name="spoon" size={100} color="white" />
+      <StatusBar backgroundColor={colors.green} hidden={false} />
+      <ImageBackground
+        source={require('../../assets/img/2.jpg')}
+        resizeMode="cover"
+        style={{height: '100%', width: '100%'}}>
+        <View style={{flex: 1, backgroundColor: colors.red}}>
+          <View style={styles.headerContainer}>
+            <View style={styles.childContainer}>
+              <Icon name="fast-food" size={70} color="white" />
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 40,
+                  fontFamily: 'cursive',
+                  textTransform: 'capitalize',
+                }}>
+                NUTRITION IS APP
+              </Text>
+            </View>
+          </View>
+          <View style={{marginTop: 40, marginBottom: 30, alignItems: 'center'}}>
+            <Text style={{color: 'white', fontSize: 25}}>
+              Welcome to our app
+            </Text>
+          </View>
+          <View style={{marginHorizontal: 50}}>
+            <TouchableNativeFeedback
+              onPress={() => navigation.navigate('Login')}>
+              <View
+                style={{
+                  backgroundColor: colors.green,
+                  padding: 10,
+                  borderRadius: 50,
+                  marginTop: 20,
+                  marginBottom: 40,
+                }}>
+                <Text
+                  style={{color: 'white', textAlign: 'center', fontSize: 20}}>
+                  LOGIN
+                </Text>
+              </View>
+            </TouchableNativeFeedback>
+            <TouchableNativeFeedback
+              onPress={() => navigation.navigate('Register')}>
+              <View
+                style={{
+                  backgroundColor: colors.darkGreen,
+                  padding: 10,
+                  borderRadius: 50,
+                }}>
+                <Text
+                  style={{color: 'white', textAlign: 'center', fontSize: 20}}>
+                  REGISTER
+                </Text>
+              </View>
+            </TouchableNativeFeedback>
+          </View>
         </View>
-      </View>
-      <View style={{marginTop: 20, alignItems: 'center'}}>
-        <Text style={{color: colors.blue, fontSize: 30}}>
-          NUTRITION MIS APP
-        </Text>
-      </View>
-      <View style={{marginHorizontal: 50}}>
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-          <View
-            style={{
-              backgroundColor: colors.green,
-              padding: 10,
-              borderRadius: 50,
-              marginVertical: 20,
-            }}>
-            <Text style={{color: 'white', textAlign: 'center', fontSize: 30}}>
-              LOGIN
-            </Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-          <View
-            style={{
-              backgroundColor: colors.darkGreen,
-              padding: 10,
-              borderRadius: 50,
-            }}>
-            <Text style={{color: 'white', textAlign: 'center', fontSize: 30}}>
-              REGISTER
-            </Text>
-          </View>
-        </TouchableOpacity>
-      </View>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -50,20 +79,19 @@ const WelcomeScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   headerContainer: {
     backgroundColor: colors.green,
-    width: 170,
-    height: 350,
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    position: 'relative',
-    borderBottomLeftRadius: 100,
-    borderBottomRightRadius: 100,
-  },
-  logoContainer: {
-    position: 'absolute',
-    bottom: 50,
+    height: 250,
     width: '100%',
-    display: 'flex',
+    transform: [{scaleX: 2}],
+    borderBottomStartRadius: 200,
+    borderBottomEndRadius: 200,
+    overflow: 'hidden',
+  },
+  childContainer: {
+    flex: 1,
+    transform: [{scaleX: 0.5}],
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: 20,
   },
 });
 

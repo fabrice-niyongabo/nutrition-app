@@ -1,5 +1,5 @@
 {
-  "name": "nutritionmis",
+  "name": "nutritionis",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -10,14 +10,21 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.15.8",
     "@react-native-community/masked-view": "^0.1.11",
     "@react-navigation/bottom-tabs": "^6.0.5",
     "@react-navigation/native": "^6.0.2",
     "@react-navigation/native-stack": "^6.1.0",
+    "axios": "^0.21.1",
+    "cors": "^2.8.5",
     "react": "17.0.1",
     "react-native": "0.64.2",
     "react-native-gesture-handler": "^1.10.3",
+    "react-native-keyboard-aware-scrollview": "^2.1.0",
+    "react-native-material-textfield": "^0.16.1",
+    "react-native-push-notification": "^8.1.1",
     "react-native-reanimated": "^2.2.2",
+    "react-native-restart": "0.0.22",
     "react-native-safe-area-context": "^3.3.2",
     "react-native-screens": "^3.7.2",
     "react-native-vector-icons": "^8.1.0"
