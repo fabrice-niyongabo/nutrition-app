@@ -5,6 +5,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import WelcomeScreen from './WelcomeScreen';
 import Login from '../Login/Login';
 import Register from '../Register/Register';
+import {green} from '../colors';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +18,7 @@ const Welcome = () => {
           component={WelcomeScreen}
           options={{
             headerTransparent: true,
+            headerShown: false,
             title: '',
             headerShadowVisible: false,
           }}
@@ -25,20 +27,20 @@ const Welcome = () => {
           name="Login"
           component={Login}
           options={{
-            headerTransparent: true,
             title: '',
             headerShadowVisible: false,
             headerTintColor: 'white',
+            headerStyle: {backgroundColor: green},
           }}
         />
         <Stack.Screen
           name="Register"
           component={Register}
           options={{
-            headerTransparent: true,
             title: '',
             headerShadowVisible: false,
             headerTintColor: 'white',
+            headerStyle: {backgroundColor: green},
           }}
         />
       </Stack.Navigator>
