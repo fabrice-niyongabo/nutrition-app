@@ -93,7 +93,9 @@ const DiabetePatientMeal = ({route, navigation}) => {
       });
 
     //cancel all subscriptions
-    return () => (isSubscribed = false);
+    return () => {
+      isSubscribed = false;
+    };
   }, [diabetePatientrenMealHistory]);
 
   const handlediabetePatientrensMealHistory = () => {
@@ -136,7 +138,9 @@ const DiabetePatientMeal = ({route, navigation}) => {
         selectMeal();
       }
     }
-    return (isSubscribed = false);
+    return () => {
+      isSubscribed = false;
+    };
   }, [isLoadingFood]);
 
   const getRandomFood = array => {

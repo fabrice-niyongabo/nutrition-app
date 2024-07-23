@@ -1,6 +1,6 @@
 module.exports = {
-  backendUrl: 'http://192.168.194.3/RN/NMIS/',
-  imageUrl: 'http://192.168.194.3/RN/NMIS/img/',
+  backendUrl: 'http://192.168.11.3/RN/NMIS/',
+  imageUrl: 'http://192.168.11.3/RN/NMIS/img/',
 };
 
 //module.exports = {

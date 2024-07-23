@@ -59,7 +59,9 @@ const Notifications = () => {
         ToastAndroid.show(err.message, ToastAndroid.SHORT);
       });
 
-    return () => (isSubscribed = false);
+    return () => {
+      isSubscribed = false;
+    };
   }, [notifications]);
 
   return (

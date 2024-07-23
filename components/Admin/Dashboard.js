@@ -73,7 +73,9 @@ function AdminDashboard({navigation}) {
         });
     }
 
-    return () => (isSubscribed = false);
+    return () => {
+      isSubscribed = false;
+    };
   }, [childrensList, womenList]);
   return (
     <SafeAreaView>

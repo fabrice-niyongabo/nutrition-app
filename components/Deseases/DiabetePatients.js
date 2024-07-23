@@ -66,7 +66,9 @@ const DiabetePatients = ({navigation}) => {
     }
 
     //cancel all subscriptions
-    return () => (isSubscribed = false);
+    return () => {
+      isSubscribed = false;
+    };
   }, [userEmail, womens]);
 
   const display = () => {

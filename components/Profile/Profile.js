@@ -36,7 +36,9 @@ const Profile = ({navigation}) => {
     }
 
     //cancel subscriptions
-    return () => (isSubscribed = false);
+    return () => {
+      isSubscribed = false;
+    };
   });
 
   const handleLogout = () => {

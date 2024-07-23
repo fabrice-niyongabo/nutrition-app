@@ -91,7 +91,9 @@ const ChildMeal = ({route, navigation}) => {
       });
 
     //cancel all subscriptions
-    return () => (isSubscribed = false);
+    return () => {
+      isSubscribed = false;
+    };
   }, [childrenMealHistory]);
 
   const handleChildrensMealHistory = () => {
@@ -134,7 +136,9 @@ const ChildMeal = ({route, navigation}) => {
         selectMeal();
       }
     }
-    return (isSubscribed = false);
+    return () => {
+      isSubscribed = false;
+    };
   }, [isLoadingFood]);
 
   const getRandomFood = array => {

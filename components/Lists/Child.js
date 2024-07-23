@@ -66,7 +66,9 @@ const Child = ({navigation}) => {
     }
 
     //cancel all subscriptions
-    return () => (isSubscribed = false);
+    return () => {
+      isSubscribed = false;
+    };
   }, [userEmail, children]);
 
   const display = () => {

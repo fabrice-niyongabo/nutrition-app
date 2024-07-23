@@ -97,7 +97,9 @@ const BloodPressurePatientMeal = ({route, navigation}) => {
       });
 
     //cancel all subscriptions
-    return () => (isSubscribed = false);
+    return () => {
+      isSubscribed = false;
+    };
   }, [bloodPressurePatientrenMealHistory]);
 
   const handlebloodPressurePatientrensMealHistory = () => {
@@ -144,7 +146,9 @@ const BloodPressurePatientMeal = ({route, navigation}) => {
         selectMeal();
       }
     }
-    return (isSubscribed = false);
+    return () => {
+      isSubscribed = false;
+    };
   }, [isLoadingFood]);
 
   const getRandomFood = array => {

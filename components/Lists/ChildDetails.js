@@ -56,7 +56,9 @@ const ChildDetails = ({route, navigation}) => {
     }
 
     //cancel all subscriptions
-    return () => (isSubscribed = false);
+    return () => {
+      isSubscribed = false;
+    };
   }, [child, mealList]);
 
   const handleDeleteMeal = id => {

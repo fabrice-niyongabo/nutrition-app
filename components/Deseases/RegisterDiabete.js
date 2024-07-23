@@ -37,7 +37,9 @@ const RegisterDieabete = ({navigation}) => {
     });
 
     //cancel all subscriptions
-    return () => (isSubscribed = false);
+    return () => {
+      isSubscribed = false;
+    };
   });
 
   const handleRegister = () => {

@@ -59,7 +59,9 @@ const DiabetePatientsDetails = ({route, navigation}) => {
     }
 
     //cancel all subscriptions
-    return () => (isSubscribed = false);
+    return () => {
+      isSubscribed = false;
+    };
   }, [bloodPressurePatient, mealList]);
 
   const handleDelete = id => {

@@ -114,7 +114,9 @@ const Deseases = ({navigation}) => {
     }
 
     //cancel all subscriptions
-    return () => (isSubscribed = false);
+    return () => {
+      isSubscribed = false;
+    };
   }, [userEmail, diabete]);
 
   const handlebloodPressuresMealHistory = () => {

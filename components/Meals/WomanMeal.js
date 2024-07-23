@@ -111,7 +111,9 @@ const WomanMeal = ({route, navigation}) => {
       });
 
     //cancel all subscriptions
-    return () => (isSubscribed = false);
+    return () => {
+      isSubscribed = false;
+    };
   }, [womenMealHistory]);
 
   const handleWomenMealHistory = () => {
@@ -154,7 +156,9 @@ const WomanMeal = ({route, navigation}) => {
         selectMeal();
       }
     }
-    return (isSubscribed = false);
+    return () => {
+      isSubscribed = false;
+    };
   }, [isLoadingFood]);
 
   const getRandomFood = array => {

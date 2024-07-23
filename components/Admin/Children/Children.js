@@ -25,7 +25,9 @@ function Children({navigation}) {
           ToastAndroid.show(error.message, ToastAndroid.SHORT);
         });
     }
-    return () => (isSubscribed = false);
+    return () => {
+      isSubscribed = false;
+    };
   }, []);
   return (
     <SafeAreaView>
