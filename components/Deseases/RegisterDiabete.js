@@ -7,13 +7,15 @@ import {
   StyleSheet,
   TouchableNativeFeedback,
   ActivityIndicator,
+  Image,
+  Dimensions,
 } from 'react-native';
 import colors from '../colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {backendUrl} from '../Config';
 import Axios from 'axios';
 import PushNotification from 'react-native-push-notification';
-
+const {width} = Dimensions.get('window');
 const RegisterDieabete = ({navigation}) => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [gotLoginDetails, setGotLoginDetails] = useState(false);
@@ -154,10 +156,14 @@ const RegisterDieabete = ({navigation}) => {
   return (
     <SafeAreaView>
       <View>
+        <Image
+          source={require('../../assets/diabete-info.jpg')}
+          style={{resizeMode: 'contain', width}}
+        />
         <View style={styles.inputsContainer}>
           <TextInput
-            placeholder="Enter Woman's name"
-            accessibilityLabel="Woman's names"
+            placeholder="Enter Patient's name"
+            accessibilityLabel="Patient's names"
             style={styles.textField}
             onChangeText={text => {
               setNames(text);

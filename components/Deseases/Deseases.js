@@ -63,6 +63,7 @@ const Deseases = ({navigation}) => {
           }
         })
         .catch(error => {
+          setIsLoadingdiabete(false);
           // ToastAndroid.show(error.message, ToastAndroid.SHORT);
           console.log(error);
           // alert(error);
@@ -108,6 +109,7 @@ const Deseases = ({navigation}) => {
           }
         })
         .catch(error => {
+          setIsLoadingbloodPressure(false);
           // console.log(error);
           ToastAndroid.show(error.message, ToastAndroid.SHORT);
         });
