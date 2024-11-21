@@ -14,7 +14,8 @@ import {returnError} from '../util';
 import colors from '../colors';
 import Monthly from './Monthly';
 
-const Prediction = () => {
+const Prediction = ({route, navigation}) => {
+  const {child} = route.params;
   const [nutritionData, setNutritionData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,7 +29,9 @@ const Prediction = () => {
       setLoading(true);
       setError(null);
 
-      const response = await axios.get(backendUrl + '/predict/child-health/1');
+      const response = await axios.get(
+        backendUrl + '/predict/child-health/' + child.id,
+      );
       console.log(response.data);
       setNutritionData(response.data);
     } catch (err) {
@@ -111,7 +114,7 @@ const Prediction = () => {
     <View style={{flex: 1}}>
       <ScrollView>
         {loading && <ActivityIndicator size="large" color={colors.green} />}
-        <Monthly />
+        <Monthly child={child} />
         {chartData && (
           <>
             <Text style={{fontSize: 20, fontWeight: 'bold', padding: 10}}>

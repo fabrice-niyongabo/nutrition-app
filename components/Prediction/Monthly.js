@@ -5,7 +5,7 @@ import {backendUrl} from '../Config';
 import {returnError} from '../util';
 import colors from '../colors';
 
-const Monthly = () => {
+const Monthly = ({child}) => {
   const [analysisData, setAnalysisData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,7 +19,7 @@ const Monthly = () => {
       setLoading(true);
       setError(null);
       const response = await axios.get(
-        backendUrl + '/predict/child-health/timely/1',
+        backendUrl + '/predict/child-health/timely/' + child.id,
       );
       setAnalysisData(response.data);
     } catch (err) {
