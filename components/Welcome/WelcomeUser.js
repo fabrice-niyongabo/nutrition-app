@@ -31,7 +31,7 @@ const Stack = createNativeStackNavigator();
 const WelcomeUser = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator screenOptions={{headerShadowVisible: false}}>
         <Stack.Screen
           name="Dashboard"
           component={Dashboard}

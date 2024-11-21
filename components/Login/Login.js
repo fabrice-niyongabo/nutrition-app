@@ -15,6 +15,7 @@ import {backendUrl} from '../Config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNRestart from 'react-native-restart';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
+import {returnError} from '../util';
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -35,22 +36,18 @@ const Login = ({navigation}) => {
       setIsRegistering(false);
       passwordRef.current.focus();
     } else {
-      Axios.post(backendUrl + 'login', {email, password})
+      Axios.post(backendUrl + '/login', {email, password})
         .then(res => {
-          if (res.data.type === 'message') {
-            setIsRegistering(false);
-            AsyncStorage.setItem('user_email', email);
-            AsyncStorage.setItem('user_names', res.data.names);
-            AsyncStorage.setItem('user_type', res.data.user_type);
-            RNRestart.Restart();
-          } else {
-            alert(`${res.data.msg}`);
-            setIsRegistering(false);
-            setEmail('');
-          }
+          AsyncStorage.setItem('token', res.data.token);
+          AsyncStorage.setItem('user_email', email);
+          AsyncStorage.setItem('user_names', res.data.names);
+          AsyncStorage.setItem('user_type', res.data.user_type);
+          RNRestart.Restart();
         })
         .catch(error => {
-          alert(error);
+          alert(returnError(error));
+        })
+        .finally(() => {
           setIsRegistering(false);
         });
     }
