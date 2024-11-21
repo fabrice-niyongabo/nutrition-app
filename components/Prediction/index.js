@@ -120,18 +120,73 @@ const Prediction = ({route, navigation}) => {
             <Text style={{fontSize: 20, fontWeight: 'bold', padding: 10}}>
               Historical Nutrition Data
             </Text>
-            <LineChart
-              data={chartData}
-              width={Dimensions.get('window').width - 20}
-              height={220}
-              chartConfig={chartConfig}
-              bezier
-              style={{
-                marginVertical: 8,
-                borderRadius: 16,
-              }}
-              legend={['Calories', 'Carbs', 'Protein', 'Fats']}
-            />
+            <View>
+              <LineChart
+                data={chartData}
+                width={Dimensions.get('window').width - 20}
+                height={220}
+                chartConfig={chartConfig}
+                bezier
+                style={{
+                  marginVertical: 8,
+                  borderRadius: 16,
+                }}
+                legend={['Calories', 'Carbs', 'Protein', 'Fats']}
+              />
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  justifyContent: 'center',
+                  padding: 10,
+                  gap: 10,
+                }}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <View
+                    style={{
+                      width: 12,
+                      height: 12,
+                      backgroundColor: 'rgba(255, 0, 0, 1)',
+                      marginRight: 4,
+                    }}
+                  />
+                  <Text>Calories</Text>
+                </View>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <View
+                    style={{
+                      width: 12,
+                      height: 12,
+                      backgroundColor: 'rgba(0, 255, 0, 1)',
+                      marginRight: 4,
+                    }}
+                  />
+                  <Text>Carbs</Text>
+                </View>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <View
+                    style={{
+                      width: 12,
+                      height: 12,
+                      backgroundColor: 'rgba(0, 0, 255, 1)',
+                      marginRight: 4,
+                    }}
+                  />
+                  <Text>Protein</Text>
+                </View>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <View
+                    style={{
+                      width: 12,
+                      height: 12,
+                      backgroundColor: 'rgba(255, 165, 0, 1)',
+                      marginRight: 4,
+                    }}
+                  />
+                  <Text>Fats</Text>
+                </View>
+              </View>
+            </View>
           </>
         )}
       </ScrollView>
