@@ -16,6 +16,7 @@ import Axios from 'axios';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {backendUrl} from '../Config';
+import {returnError} from '../util';
 
 const width = Dimensions.get('window').width;
 
@@ -24,9 +25,18 @@ const Child = ({navigation}) => {
   const [isLoading, setIsLoading] = useState(true);
   const [gotLoginDetails, setGotLoginDetails] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
+  const [token, setToken] = useState(null);
 
   const handleDelete = id => {
-    Axios.post(backendUrl + 'deleteChild', {userEmail, id})
+    Axios.post(
+      backendUrl + 'deleteChild',
+      {userEmail, id},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    )
       .then(res => {
         // console.log(res.data);
         ToastAndroid.show(res.data.msg, ToastAndroid.SHORT);
@@ -49,19 +59,31 @@ const Child = ({navigation}) => {
       }
     });
 
-    if (userEmail != null) {
-      Axios.get(backendUrl + 'childList?userEmail=' + userEmail)
+    AsyncStorage.getItem('token').then(value => {
+      if (isSubscribed) {
+        if (value != null) {
+          setToken(value);
+        }
+        setGotLoginDetails(true);
+      }
+    });
+
+    if (token != null) {
+      Axios.get(backendUrl + '/children', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
         .then(res => {
-          if (isSubscribed) {
-            setIsLoading(false);
-            // console.log(res.data);
-            setChilds(res.data);
-          }
+          setIsLoading(false);
+          setChilds(res.data.children);
         })
         .catch(error => {
-          // console.log(error);
-          ToastAndroid.show(error.message, ToastAndroid.SHORT);
-          // alert(error);
+          console.log(JSON.stringify(error));
+          ToastAndroid.show(returnError(error), ToastAndroid.SHORT);
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     }
 
@@ -69,7 +91,7 @@ const Child = ({navigation}) => {
     return () => {
       isSubscribed = false;
     };
-  }, [userEmail, children]);
+  }, [token]);
 
   const display = () => {
     if (!gotLoginDetails) {

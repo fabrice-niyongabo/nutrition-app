@@ -7,21 +7,26 @@ import {
   StyleSheet,
   TouchableNativeFeedback,
   ActivityIndicator,
+  ToastAndroid,
 } from 'react-native';
 import colors from '../colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PushNotification from 'react-native-push-notification';
 import {backendUrl} from '../Config';
 import Axios from 'axios';
+import {returnError} from '../util';
 
 const RegisterChild = ({navigation}) => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [gotLoginDetails, setGotLoginDetails] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
+  const [token, setToken] = useState(null);
   const [day, setDay] = useState('');
   const [month, setMonth] = useState('');
   const [year, setYear] = useState('');
   const [names, setNames] = useState('');
+  const [height, setHeight] = useState('');
+  const [weight, setWeight] = useState('');
 
   useEffect(() => {
     let isSubscribed = true;
@@ -30,6 +35,15 @@ const RegisterChild = ({navigation}) => {
       if (isSubscribed) {
         if (value != null) {
           setUserEmail(value);
+        }
+        setGotLoginDetails(true);
+      }
+    });
+
+    AsyncStorage.getItem('token').then(value => {
+      if (isSubscribed) {
+        if (value != null) {
+          setToken(value);
         }
         setGotLoginDetails(true);
       }
@@ -101,42 +115,56 @@ const RegisterChild = ({navigation}) => {
       return;
     }
 
-    setIsRegistering(true);
-    Axios.post(backendUrl + 'registerChild', {
-      names,
-      day,
-      month,
-      year,
-      userEmail,
-    })
-      .then(res => {
-        if (res.data.type === 'message') {
-          // alert(res.data.msg);
-          PushNotification.localNotification({
-            channelId: 'notification-channel',
-            title: 'Congratulations',
-            message: `${names} has been registered to our app successfully.`,
-            allowWhileIdle: true,
-            vibrate: true,
-          });
-          setIsRegistering(false);
+    if (height.trim() != '') {
+      setHeight(height);
+    } else {
+      setHeight('');
+      alert('Invalid height');
+      return;
+    }
 
-          navigation.navigate('Child');
-        } else {
-          if (res.data.type === 'warning') {
-            alert(`${res.data.msg}.`);
-          } else {
-            alert(`${res.data.msg}. ${res.data.error}`);
-          }
-          setIsRegistering(false);
-          setNames('');
-          setDay('');
-          setMonth('');
-          setYear('');
-        }
+    if (weight.trim() != '') {
+      setWeight(weight);
+    } else {
+      setWeight('');
+      alert('Invalid weight');
+      return;
+    }
+
+    setIsRegistering(true);
+    Axios.post(
+      backendUrl + '/children',
+      {
+        names,
+        day,
+        month,
+        year,
+        userEmail,
+        height,
+        weight,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    )
+      .then(res => {
+        // alert(res.data.msg);
+        PushNotification.localNotification({
+          channelId: 'notification-channel',
+          title: 'Congratulations',
+          message: `${names} has been registered to our app successfully.`,
+          allowWhileIdle: true,
+          vibrate: true,
+        });
+        setIsRegistering(false);
+        navigation.navigate('Child');
       })
       .catch(error => {
-        alert(error);
+        ToastAndroid.show(returnError(error), ToastAndroid.SHORT);
+      })
+      .finally(() => {
         setIsRegistering(false);
       });
   };
@@ -205,6 +233,24 @@ const RegisterChild = ({navigation}) => {
             }}
             value={names}
           />
+          <TextInput
+            placeholder="Enter Child's height in cm"
+            accessibilityLabel="Child's height"
+            style={styles.textField}
+            onChangeText={text => {
+              setHeight(text);
+            }}
+            value={height}
+          />
+          <TextInput
+            placeholder="Enter Child's weight in kg"
+            accessibilityLabel="Child's weight"
+            style={styles.textField}
+            onChangeText={text => {
+              setWeight(text);
+            }}
+            value={weight}
+          />
           <Text>Date of birth</Text>
           <View
             style={{
@@ -252,6 +298,7 @@ const RegisterChild = ({navigation}) => {
               }}
             />
           </View>
+
           <View style={{marginTop: 15}}>{registerButton()}</View>
         </View>
       </View>

@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Axios from 'axios';
 import PushNotification from 'react-native-push-notification';
 import {backendUrl} from '../Config';
+import {returnError} from '../util';
 
 const width = Dimensions.get('window').width;
 
@@ -90,7 +91,7 @@ const Dashboard = ({navigation}) => {
           setChildren(res.data.children);
         })
         .catch(error => {
-          ToastAndroid.show(error.message, ToastAndroid.SHORT);
+          ToastAndroid.show(returnError(error), ToastAndroid.SHORT);
         })
         .finally(() => {
           setIsLoadingChildren(false);
