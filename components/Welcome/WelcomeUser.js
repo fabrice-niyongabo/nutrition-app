@@ -25,6 +25,7 @@ import BloodPressurePatientMeal from '../Deseases/BloodPressurePatientMeal';
 import DiabetePatients from '../Deseases/DiabetePatients';
 import DiabetePatientDetails from '../Deseases/DiabetePatientDetails';
 import DiabetePatientMeal from '../Deseases/DiabetePatientMeal';
+import Prediction from '../Prediction';
 
 const Stack = createNativeStackNavigator();
 
@@ -127,12 +128,21 @@ const WelcomeUser = () => {
           name="ChildDetails"
           component={ChildDetails}
           options={{
-            title: 'Child Meal Details',
+            title: 'Child Meal Recommendation',
             headerTintColor: 'white',
             headerStyle: {backgroundColor: colors.green},
             // headerTransparent: true,
             // headerShadowVisible: false,
             headerBackVisible: false,
+          }}
+        />
+        <Stack.Screen
+          name="Prediction"
+          component={Prediction}
+          options={{
+            title: 'Health Status Prediction',
+            headerTintColor: 'white',
+            headerStyle: {backgroundColor: colors.green},
           }}
         />
         <Stack.Screen

@@ -131,13 +131,13 @@ const Child = ({navigation}) => {
                       <View style={{width: 55}}>
                         <Icon name="user-circle" size={50} color="#333" />
                       </View>
-                      <View style={{width: '65%'}}>
+                      <View style={{flex: 1}}>
                         <Text>{child.names}</Text>
                         <Text style={{color: '#777'}}>
                           Born {child.day}/{child.month}/{child.year}
                         </Text>
                       </View>
-                      <TouchableNativeFeedback
+                      {/* <TouchableNativeFeedback
                         onPress={() => {
                           handleDelete(child.id);
                         }}>
@@ -151,7 +151,7 @@ const Child = ({navigation}) => {
                           }}>
                           <Icon name="trash" size={20} color={colors.green} />
                         </View>
-                      </TouchableNativeFeedback>
+                      </TouchableNativeFeedback> */}
                     </View>
                   </TouchableNativeFeedback>
                 );

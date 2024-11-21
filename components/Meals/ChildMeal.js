@@ -16,17 +16,20 @@ import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import Icon2 from 'react-native-vector-icons/dist/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {backendUrl, imageUrl} from '../Config';
+import {returnError} from '../util';
 
 const ChildMeal = ({route, navigation}) => {
   const {child} = route.params;
   const [gotLoginDetails, setGotLoginDetails] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
+  const [token, setToken] = useState(null);
   const [isLoadingFood, setIsLoadingFood] = useState(true);
   const [foods, setFoods] = useState({});
   const [meal, setMeal] = useState([]);
   const [isSavingMeal, setIsSavingMeal] = useState(false);
   const [gotChildrenMealHistory, setGotChildrenMealHistory] = useState(false);
   const [childrenMealHistory, setChildrenMealHistory] = useState([]);
+  const [mealRecommendation, setMealRecommendation] = useState([]);
   const [takeAnotherMeal, setTakeAnotherMeal] = useState(false);
 
   useEffect(() => {
@@ -41,60 +44,39 @@ const ChildMeal = ({route, navigation}) => {
       }
     });
 
-    Axios.post(backendUrl + 'getAllMealHistory', {
-      email: userEmail,
-      personType: 'child',
-    })
-      .then(res => {
-        if (isSubscribed) {
-          setChildrenMealHistory(res.data);
-          setGotChildrenMealHistory(true);
-          handleChildrensMealHistory();
+    AsyncStorage.getItem('token').then(value => {
+      if (isSubscribed) {
+        if (value != null) {
+          setToken(value);
         }
-      })
-      .catch(error => {
-        // console.log(error);
-        ToastAndroid.show(error.message, ToastAndroid.SHORT);
-        // alert(error);
-      });
+      }
+    });
 
-    Axios.get(backendUrl + 'childrensFood')
-      .then(res => {
-        if (isSubscribed) {
-          const dataFood = res.data;
-          let filteredFoods = {};
-          for (let i = 0; i < dataFood.length; i++) {
-            let category = dataFood[i].food_category;
-            if (!filteredFoods[category]) {
-              filteredFoods[category] = [];
-            }
-            for (let j = 0; j < dataFood.length; j++) {
-              if (dataFood[j].food_category == category) {
-                filteredFoods[category].push({
-                  id: dataFood[j].id,
-                  name: dataFood[j].name,
-                  image: dataFood[j].image,
-                  category: category,
-                });
-              }
-            }
+    if (token != null) {
+      Axios.get(backendUrl + '/childrenFood/recommend', {
+        email: userEmail,
+        personType: 'child',
+      })
+        .then(res => {
+          if (isSubscribed) {
+            setChildrenMealHistory(res.data);
+            setGotChildrenMealHistory(true);
+            handleChildrensMealHistory();
           }
-
-          setFoods(filteredFoods);
+        })
+        .catch(error => {
+          ToastAndroid.show(returnError(error), ToastAndroid.SHORT);
+        })
+        .finally(() => {
           setIsLoadingFood(false);
-        }
-      })
-      .catch(error => {
-        // alert(error);
-        // console.log(error);
-        ToastAndroid.show(error.message, ToastAndroid.SHORT);
-      });
+        });
+    }
 
     //cancel all subscriptions
     return () => {
       isSubscribed = false;
     };
-  }, [childrenMealHistory]);
+  }, [token]);
 
   const handleChildrensMealHistory = () => {
     let date = new Date();

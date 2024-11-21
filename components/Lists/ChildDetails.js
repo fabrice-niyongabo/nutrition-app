@@ -8,18 +8,24 @@ import {
   ScrollView,
   ActivityIndicator,
   ToastAndroid,
+  Image,
+  Button,
+  Pressable,
 } from 'react-native';
 import colors from '../colors';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import Axios from 'axios';
 import {backendUrl} from '../Config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const width = Dimensions.get('window').width;
 
 const ChildDetails = ({route, navigation}) => {
   const {child, userEmail} = route.params;
-  const [mealList, setMealList] = useState([]);
+  const [token, setToken] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingSubmitting, setIsLoadingSubmitting] = useState(false);
 
   const calculateMonths = person => {
     const today = new Date();
@@ -33,25 +39,28 @@ const ChildDetails = ({route, navigation}) => {
   useEffect(() => {
     let isSubscribed = true;
 
-    if (userEmail != null) {
-      Axios.post(backendUrl + 'childMealList', {userEmail, childId: child.id})
+    AsyncStorage.getItem('token').then(value => {
+      if (isSubscribed) {
+        if (value != null) {
+          setToken(value);
+        }
+      }
+    });
+
+    if (token != null) {
+      Axios.get(backendUrl + '/childrenFood/recommend/' + child.id, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
         .then(res => {
-          if (isSubscribed) {
-            setIsLoading(false);
-            let rs = [];
-            for (let i = 0; i < res.data.length; i++) {
-              let data = res.data[i];
-              data.meal = JSON.parse(data.meal);
-              rs.push(data);
-            }
-            setMealList(rs);
-            setIsLoading(false);
-          }
+          setRecommendations(res.data.recommendation);
         })
         .catch(error => {
-          // console.log(error);
-          ToastAndroid.show(error.message, ToastAndroid.SHORT);
-          // alert(error);
+          ToastAndroid.show(returnError(error), ToastAndroid.SHORT);
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     }
 
@@ -59,21 +68,36 @@ const ChildDetails = ({route, navigation}) => {
     return () => {
       isSubscribed = false;
     };
-  }, [child, mealList]);
+  }, [token]);
 
-  const handleDeleteMeal = id => {
-    Axios.post(backendUrl + 'deleteChildMeal', {
-      userEmail,
-      id,
-      childId: child.id,
-    })
+  const handleRecordMeal = () => {
+    if (recommendations.length === 0) {
+      alert('No recommendations found');
+      return;
+    }
+    if (!token) return;
+    setIsLoadingSubmitting(true);
+    // api call to record meal
+    Axios.post(
+      backendUrl + '/childrenFood/record',
+      {
+        child_id: child.id,
+        meals: recommendations,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    )
       .then(res => {
-        // console.log(res.data);
-        ToastAndroid.show(res.data.msg, ToastAndroid.SHORT);
+        alert('Meal recorded successfully');
       })
-      .catch(err => {
-        // console.log(err);
-        ToastAndroid.show(err.message, ToastAndroid.SHORT);
+      .catch(error => {
+        ToastAndroid.show(returnError(error), ToastAndroid.SHORT);
+      })
+      .finally(() => {
+        setIsLoadingSubmitting(false);
       });
   };
 
@@ -92,22 +116,22 @@ const ChildDetails = ({route, navigation}) => {
           <View style={{width: 50}}>
             <Icon name="user-circle" size={40} color="white" />
           </View>
-          <View style={{width: '70%'}}>
+          <View style={{flex: 1}}>
             <Text style={{color: 'white', fontSize: 20}}>{child.names}</Text>
             <Text style={{color: colors.gray2}}>
               Born {child.day}/{child.month}/{child.year}
             </Text>
           </View>
-          {calculateMonths(child) >= 6 && (
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('ChildMeal', {child});
-              }}>
-              <View style={{width: 40, alignItems: 'center'}}>
-                <Icon name="plus" size={30} color="white" />
-              </View>
-            </TouchableOpacity>
-          )}
+
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('Prediction', {child});
+            }}>
+            <View style={{alignItems: 'center'}}>
+              <Icon name="history" size={30} color="white" />
+              <Text style={{color: 'white'}}>Health Prediction</Text>
+            </View>
+          </TouchableOpacity>
         </View>
 
         <View
@@ -137,122 +161,168 @@ const ChildDetails = ({route, navigation}) => {
                 }}>
                 <Text
                   style={{fontSize: 20, color: colors.blue, marginBottom: 10}}>
-                  Meals taken by {child.names} this month
+                  Foods recommended
                 </Text>
 
-                {calculateMonths(child) < 6 ? (
-                  <>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        padding: 10,
-                        alignItems: 'flex-start',
-                        justifyContent: 'space-between',
-                      }}>
-                      <View style={{paddingRight: 10}}>
-                        <Icon
-                          name="exclamation-triangle"
-                          size={30}
-                          color={colors.brown}
-                        />
-                      </View>
-                      <Text style={{color: colors.brown}}>
-                        {child.names} has {calculateMonths(child)} months. He
-                        only need breastmilk as his main source of energy and
-                        nutrients.
-                      </Text>
-                    </View>
-                    <Text>
-                      You will start giving him other foods when he is over six
-                      months. This is not the right time to give him foods, we
-                      will notify you when it is the right time.
+                {isLoading ? (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      height: 300,
+                    }}>
+                    <ActivityIndicator color={colors.green} size={30} />
+                    <Text style={{color: 'black', marginTop: 10}}>
+                      Looking for recommendations...
                     </Text>
-                  </>
+                  </View>
                 ) : (
                   <>
-                    {isLoading ? (
+                    {recommendations.map((data, index) => (
                       <View
+                        key={index}
                         style={{
+                          backgroundColor: colors.gray2,
+                          padding: 10,
+                          borderRadius: 6,
+                          marginVertical: 10,
                           alignItems: 'center',
-                          justifyContent: 'center',
-                          height: 300,
+                          justifyContent: 'space-between',
+                          gap: 10,
+                          flexDirection: 'row',
                         }}>
-                        <ActivityIndicator color={colors.green} size={30} />
-                        <Text style={{color: 'black', marginTop: 10}}>
-                          Looking for meal...
-                        </Text>
-                      </View>
-                    ) : (
-                      <>
-                        {mealList.length > 0 ? (
-                          <>
-                            {mealList.map((data, index) => (
-                              <View
-                                key={index}
-                                style={{
-                                  backgroundColor: colors.gray2,
-                                  padding: 10,
-                                  borderRadius: 6,
-                                  marginVertical: 10,
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  flexDirection: 'row',
-                                }}>
-                                <View style={{width: '85%'}}>
-                                  <View
-                                    style={{
-                                      alignItems: 'center',
-                                      justifyContent: 'flex-start',
-                                      flexDirection: 'row',
-                                      flexWrap: 'wrap',
-                                    }}>
-                                    {data.meal.map((food, index) =>
-                                      index == 0 ? (
-                                        <Text
-                                          key={index}
-                                          style={{color: colors.blue}}>
-                                          {food.name}{' '}
-                                        </Text>
-                                      ) : (
-                                        <Text
-                                          key={index}
-                                          style={{color: colors.blue}}>
-                                          - {food.name}{' '}
-                                        </Text>
-                                      ),
-                                    )}
-                                  </View>
-                                  <Text style={{color: '#777'}}>
-                                    {data.date}
+                        <View style={{width: '85%'}}>
+                          <View
+                            style={{
+                              alignItems: 'flex-start',
+                              flexDirection: 'row',
+                              justifyContent: 'space-between',
+                              gap: 10,
+                            }}>
+                            <View>
+                              {data.image.trim() === '' ? (
+                                <Icon
+                                  name="picture-o"
+                                  size={100}
+                                  color={colors.blue}
+                                />
+                              ) : (
+                                <Image
+                                  source={{uri: data.image}}
+                                  width={100}
+                                  height={100}
+                                  resizeMode="contain"
+                                  style={{borderRadius: 10}}
+                                />
+                              )}
+                            </View>
+                            <View style={{flex: 1}}>
+                              <Text style={{textTransform: 'capitalize'}}>
+                                {data.name}
+                              </Text>
+                              {data.description && (
+                                <Text>{data.description}</Text>
+                              )}
+                              <View style={{marginTop: 8}}>
+                                <Text
+                                  style={{
+                                    fontSize: 12,
+                                    color: '#666',
+                                    fontWeight: 'bold',
+                                  }}>
+                                  Nutrients per serving:
+                                </Text>
+                                <View
+                                  style={{
+                                    flexDirection: 'row',
+                                    flexWrap: 'wrap',
+                                    gap: 8,
+                                    marginTop: 4,
+                                  }}>
+                                  <Text style={{fontSize: 11}}>
+                                    <Text style={{fontWeight: 'bold'}}>
+                                      Calories:
+                                    </Text>{' '}
+                                    {data.calories}g
+                                  </Text>
+                                  <Text style={{fontSize: 11}}>
+                                    <Text style={{fontWeight: 'bold'}}>
+                                      Protein:
+                                    </Text>{' '}
+                                    {data.protein}g
+                                  </Text>
+                                  <Text style={{fontSize: 11}}>
+                                    <Text style={{fontWeight: 'bold'}}>
+                                      Carbs:
+                                    </Text>{' '}
+                                    {data.carbs}g
+                                  </Text>
+                                  <Text style={{fontSize: 11}}>
+                                    <Text style={{fontWeight: 'bold'}}>
+                                      Fats:
+                                    </Text>{' '}
+                                    {data.fats}g
                                   </Text>
                                 </View>
-                                <TouchableOpacity
-                                  onPress={() => {
-                                    handleDeleteMeal(data.id);
+                                <View
+                                  style={{
+                                    flexDirection: 'row',
+                                    flexWrap: 'wrap',
+                                    gap: 8,
+                                    marginTop: 2,
                                   }}>
-                                  <View>
-                                    <Icon
-                                      name="trash"
-                                      size={30}
-                                      color={colors.green}
-                                    />
-                                  </View>
-                                </TouchableOpacity>
+                                  <Text style={{fontSize: 11}}>
+                                    <Text style={{fontWeight: 'bold'}}>
+                                      Calcium:
+                                    </Text>{' '}
+                                    {data.calcium}mg
+                                  </Text>
+                                  <Text style={{fontSize: 11}}>
+                                    <Text style={{fontWeight: 'bold'}}>
+                                      Iron:
+                                    </Text>{' '}
+                                    {data.iron}mg
+                                  </Text>
+                                  <Text style={{fontSize: 11}}>
+                                    <Text style={{fontWeight: 'bold'}}>
+                                      Folic Acid:
+                                    </Text>{' '}
+                                    {data.folic_acid}mcg
+                                  </Text>
+                                  <Text style={{fontSize: 11}}>
+                                    <Text style={{fontWeight: 'bold'}}>
+                                      Vitamin D:
+                                    </Text>{' '}
+                                    {data.vitamin_d}mcg
+                                  </Text>
+                                </View>
                               </View>
-                            ))}
-                          </>
-                        ) : (
-                          <Text>
-                            Seems like {child.names} did not took any meal. Hit
-                            the plus icon at the top and start feeding him.
-                          </Text>
-                        )}
-                      </>
-                    )}
+                            </View>
+                          </View>
+                        </View>
+                      </View>
+                    ))}
                   </>
                 )}
               </View>
             </ScrollView>
+            <View style={{padding: 10}}>
+              <Pressable
+                onPress={handleRecordMeal}
+                loading={isLoadingSubmitting}
+                disabled={isLoadingSubmitting}
+                style={{
+                  backgroundColor: colors.green,
+                  padding: 10,
+                  borderRadius: 6,
+                }}>
+                {isLoadingSubmitting ? (
+                  <ActivityIndicator size={20} />
+                ) : (
+                  <Text style={{color: 'white'}}>Record Meal</Text>
+                )}
+              </Pressable>
+            </View>
           </View>
         </View>
 
