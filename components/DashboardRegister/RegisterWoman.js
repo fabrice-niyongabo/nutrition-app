@@ -13,16 +13,20 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {backendUrl} from '../Config';
 import Axios from 'axios';
 import PushNotification from 'react-native-push-notification';
+import {returnError} from '../util';
 
 const RegisterWoman = ({navigation}) => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [gotLoginDetails, setGotLoginDetails] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
+  const [token, setToken] = useState(null);
   const [pregnancyMonth, setPregnancyMonth] = useState('');
   const [day, setDay] = useState('');
   const [month, setMonth] = useState('');
   const [year, setYear] = useState('');
   const [names, setNames] = useState('');
+  const [height, setHeight] = useState('');
+  const [weight, setWeight] = useState('');
 
   useEffect(() => {
     let isSubscribed = true;
@@ -36,11 +40,17 @@ const RegisterWoman = ({navigation}) => {
       }
     });
 
+    AsyncStorage.getItem('token').then(value => {
+      if (value != null) {
+        setToken(value);
+      }
+    });
+
     //cancel all subscriptions
     return () => {
       isSubscribed = false;
     };
-  });
+  }, []);
 
   const handleRegister = () => {
     if (names.trim() == '') {
@@ -120,44 +130,50 @@ const RegisterWoman = ({navigation}) => {
       return;
     }
 
-    setIsRegistering(true);
-    Axios.post(backendUrl + 'registerWoman', {
-      names,
-      day,
-      month,
-      year,
-      userEmail,
-      pregnancyMonth,
-    })
-      .then(res => {
-        if (res.data.type === 'message') {
-          // alert(res.data.msg);
-          PushNotification.localNotification({
-            channelId: 'notification-channel',
-            title: 'Meal reminder!',
-            message: `Its time to take meal!`,
-            bigText: `${names} has been registerd to our app successfully`,
-            allowWhileIdle: true,
-            vibrate: true,
-          });
-          setIsRegistering(false);
+    if (height.trim() != '') {
+      setHeight(height);
+    } else {
+      setHeight('');
+      alert('Invalid height');
+      return;
+    }
 
-          navigation.navigate('Women');
-        } else {
-          if (res.data.type === 'warning') {
-            alert(`${res.data.msg}.`);
-          } else {
-            alert(`${res.data.msg}. ${JSON.stringify(res.data.error)}`);
-          }
-          setIsRegistering(false);
-          setNames('');
-          setDay('');
-          setMonth('');
-          setYear('');
-        }
+    if (weight.trim() != '') {
+      setWeight(weight);
+    } else {
+      setWeight('');
+      alert('Invalid weight');
+      return;
+    }
+
+    setIsRegistering(true);
+    Axios.post(
+      backendUrl + '/women',
+      {
+        names,
+        day,
+        month,
+        year,
+        userEmail,
+        pregnancyMonth,
+        height,
+        weight,
+      },
+      {
+        headers: {
+          Authorization: 'Bearer ' + token,
+        },
+      },
+    )
+      .then(res => {
+        setIsRegistering(false);
+
+        navigation.navigate('Women');
       })
       .catch(error => {
-        alert(error);
+        alert(returnError(error));
+      })
+      .finally(() => {
         setIsRegistering(false);
       });
   };
@@ -281,6 +297,26 @@ const RegisterWoman = ({navigation}) => {
               }}
             />
           </View>
+          <TextInput
+            placeholder="Enter Woman's height in cm"
+            accessibilityLabel="Woman's height"
+            style={styles.textField}
+            keyboardType="number-pad"
+            onChangeText={text => {
+              setHeight(text);
+            }}
+            value={height}
+          />
+          <TextInput
+            placeholder="Enter Woman's weight in kg"
+            accessibilityLabel="Woman's weight"
+            style={styles.textField}
+            keyboardType="number-pad"
+            onChangeText={text => {
+              setWeight(text);
+            }}
+            value={weight}
+          />
           <View style={{marginTop: 15}}>{registerButton()}</View>
         </View>
       </View>

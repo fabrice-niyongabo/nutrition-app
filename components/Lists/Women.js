@@ -16,6 +16,7 @@ import Axios from 'axios';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {backendUrl} from '../Config';
+import {returnError} from '../util';
 
 const width = Dimensions.get('window').width;
 
@@ -24,18 +25,7 @@ const Women = ({navigation}) => {
   const [isLoading, setIsLoading] = useState(true);
   const [gotLoginDetails, setGotLoginDetails] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
-
-  const handleDelete = id => {
-    Axios.post(backendUrl + 'deleteWoman', {userEmail, id})
-      .then(res => {
-        // console.log(res.data);
-        ToastAndroid.show(res.data.msg, ToastAndroid.SHORT);
-      })
-      .catch(error => {
-        ToastAndroid.show(error.message, ToastAndroid.SHORT);
-        // console.log(error);
-      });
-  };
+  const [token, setToken] = useState(null);
 
   useEffect(() => {
     let isSubscribed = true;
@@ -49,27 +39,40 @@ const Women = ({navigation}) => {
       }
     });
 
-    if (userEmail != null) {
-      Axios.get(backendUrl + 'wemenList?userEmail=' + userEmail)
-        .then(res => {
-          if (isSubscribed) {
-            setIsLoading(false);
-            // console.log(res.data);
-            setWomens(res.data);
-          }
-        })
-        .catch(error => {
-          ToastAndroid.show(error.message, ToastAndroid.SHORT);
-          // console.log(error);
-          // alert(error);
-        });
-    }
+    AsyncStorage.getItem('token').then(value => {
+      if (isSubscribed) {
+        if (value != null) {
+          setToken(value);
+        }
+        setGotLoginDetails(true);
+      }
+    });
 
     //cancel all subscriptions
     return () => {
       isSubscribed = false;
     };
   }, [userEmail, womens]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    Axios.get(backendUrl + '/women', {
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+    })
+      .then(res => {
+        setWomens(res.data.women);
+      })
+      .catch(error => {
+        ToastAndroid.show(returnError(error), ToastAndroid.SHORT);
+        // console.log(error);
+        // alert(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [token]);
 
   const display = () => {
     if (!gotLoginDetails) {
@@ -105,31 +108,17 @@ const Women = ({navigation}) => {
                         backgroundColor: colors.gray3,
                         padding: 10,
                         borderRadius: 10,
+                        gap: 10,
                       }}>
                       <View style={{width: 55}}>
                         <Icon name="user-circle" size={50} color="#333" />
                       </View>
-                      <View style={{width: '65%'}}>
+                      <View style={{flex: 1}}>
                         <Text>{woman.names}</Text>
                         <Text style={{color: '#777'}}>
                           Born {woman.day}/{woman.month}/{woman.year}
                         </Text>
                       </View>
-                      <TouchableNativeFeedback
-                        onPress={() => {
-                          handleDelete(woman.id);
-                        }}>
-                        <View
-                          style={{
-                            height: '100%',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexDirection: 'row',
-                            width: 40,
-                          }}>
-                          <Icon name="trash" size={20} color={colors.green} />
-                        </View>
-                      </TouchableNativeFeedback>
                     </View>
                   </TouchableNativeFeedback>
                 );
