@@ -8,17 +8,23 @@ import {
   ScrollView,
   ActivityIndicator,
   ToastAndroid,
+  Image,
+  Pressable,
 } from 'react-native';
 import colors from '../colors';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Axios from 'axios';
 import {backendUrl} from '../Config';
+import {returnError} from '../util';
 const width = Dimensions.get('window').width;
 
 const WomanDetails = ({route, navigation}) => {
   const {woman, userEmail} = route.params;
-  const [mealList, setMealList] = useState([]);
+  const [token, setToken] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingSubmitting, setIsLoadingSubmitting] = useState(false);
   const [pregnancyMonth, setPregnancyMonth] = useState(0);
 
   const calculateMonths = person => {
@@ -31,20 +37,30 @@ const WomanDetails = ({route, navigation}) => {
   };
 
   useEffect(() => {
+    AsyncStorage.getItem('token').then(value => {
+      if (value != null) {
+        setToken(value);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
     let isSubscribed = true;
+
     const month = parseInt(woman.pregnancy_month, 10) + calculateMonths(woman);
     setPregnancyMonth(month);
 
-    if (userEmail != null) {
-      Axios.post(backendUrl + '/womenFood/recommend/' + woman.id)
+    if (token != null && isSubscribed) {
+      Axios.get(backendUrl + '/womenFood/recommend/' + woman.id, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
         .then(res => {
-          setMealList(res.data);
-          console.log(res.data);
+          setRecommendations(res.data.recommendation);
         })
         .catch(error => {
-          // console.log(error);
-          ToastAndroid.show(error.message, ToastAndroid.SHORT);
-          // alert(error);
+          ToastAndroid.show(returnError(error), ToastAndroid.SHORT);
         })
         .finally(() => {
           setIsLoading(false);
@@ -55,21 +71,37 @@ const WomanDetails = ({route, navigation}) => {
     return () => {
       isSubscribed = false;
     };
-  }, [woman]);
+  }, [token, woman]);
 
-  const handleDelete = id => {
-    Axios.post(backendUrl + 'deleteWomanMeal', {
-      userEmail,
-      id,
-      womanId: woman.id,
-    })
+  const handleRecordMeal = () => {
+    if (recommendations.length === 0) {
+      alert('No recommendations found');
+      return;
+    }
+    if (!token) return;
+    setIsLoadingSubmitting(true);
+    // api call to record meal
+    Axios.post(
+      backendUrl + '/womenFood/record',
+      {
+        woman_id: woman.id,
+        meals: recommendations,
+        pregnancy_month: woman.pregnancy_month,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    )
       .then(res => {
-        // console.log(res.data);
-        ToastAndroid.show(res.data.msg, ToastAndroid.SHORT);
+        alert('Meal recorded successfully');
       })
-      .catch(err => {
-        // console.log(err);
-        ToastAndroid.show(err.message, ToastAndroid.SHORT);
+      .catch(error => {
+        ToastAndroid.show(returnError(error), ToastAndroid.SHORT);
+      })
+      .finally(() => {
+        setIsLoadingSubmitting(false);
       });
   };
 
@@ -88,7 +120,7 @@ const WomanDetails = ({route, navigation}) => {
           <View style={{width: 50}}>
             <Icon name="user-circle" size={40} color="white" />
           </View>
-          <View style={{width: '60%'}}>
+          <View style={{flex: 1}}>
             <Text style={{color: 'white', fontSize: 20}} numberLines="1">
               {woman.names}
             </Text>
@@ -103,7 +135,7 @@ const WomanDetails = ({route, navigation}) => {
                 alignItems: 'center',
                 flexDirection: 'row',
               }}>
-              {pregnancyMonth != 0 && pregnancyMonth <= 9 && (
+              {/* {pregnancyMonth != 0 && pregnancyMonth <= 9 && (
                 <TouchableOpacity
                   onPress={() => {
                     navigation.navigate('WomanMeal', {woman, pregnancyMonth});
@@ -120,7 +152,7 @@ const WomanDetails = ({route, navigation}) => {
                 <View style={{paddingHorizontal: 10}}>
                   <Icon name="ellipsis-v" size={30} color="white" />
                 </View>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           </View>
         </View>
@@ -191,10 +223,22 @@ const WomanDetails = ({route, navigation}) => {
                         </Text>
                       </View>
                     ) : (
-                      <>
-                        {mealList.length > 0 ? (
+                      <View>
+                        {isLoading ? (
+                          <View
+                            style={{
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              height: 300,
+                            }}>
+                            <ActivityIndicator color={colors.green} size={30} />
+                            <Text style={{color: 'black', marginTop: 10}}>
+                              Looking for recommendations...
+                            </Text>
+                          </View>
+                        ) : (
                           <>
-                            {mealList.map((data, index) => (
+                            {recommendations.map((data, index) => (
                               <View
                                 key={index}
                                 style={{
@@ -202,72 +246,150 @@ const WomanDetails = ({route, navigation}) => {
                                   padding: 10,
                                   borderRadius: 6,
                                   marginVertical: 10,
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                  gap: 10,
+                                  flexDirection: 'row',
                                 }}>
-                                <Text>
-                                  {data.pregnancy_month} Pregnancy month
-                                </Text>
-                                <View
-                                  style={{
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    flexDirection: 'row',
-                                  }}>
-                                  <View style={{width: '90%'}}>
-                                    <View
-                                      style={{
-                                        alignItems: 'center',
-                                        justifyContent: 'flex-start',
-                                        flexDirection: 'row',
-                                        flexWrap: 'wrap',
-                                      }}>
-                                      {data.meal.map((food, index) =>
-                                        index == 0 ? (
-                                          <Text
-                                            key={index}
-                                            style={{color: colors.blue}}>
-                                            {food.name}{' '}
-                                          </Text>
-                                        ) : (
-                                          <Text
-                                            key={index}
-                                            style={{color: colors.blue}}>
-                                            - {food.name}{' '}
-                                          </Text>
-                                        ),
-                                      )}
-                                    </View>
-                                    <Text style={{color: '#777'}}>
-                                      {data.date}
-                                    </Text>
-                                  </View>
-                                  <TouchableOpacity
-                                    onPress={() => {
-                                      handleDelete(data.id);
+                                <View style={{width: '85%'}}>
+                                  <View
+                                    style={{
+                                      alignItems: 'flex-start',
+                                      flexDirection: 'row',
+                                      justifyContent: 'space-between',
+                                      gap: 10,
                                     }}>
                                     <View>
-                                      <Icon
-                                        name="trash"
-                                        size={30}
-                                        color={colors.green}
-                                      />
+                                      {data.image.trim() === '' ? (
+                                        <Icon
+                                          name="picture-o"
+                                          size={100}
+                                          color={colors.blue}
+                                        />
+                                      ) : (
+                                        <Image
+                                          source={{uri: data.image}}
+                                          width={100}
+                                          height={100}
+                                          resizeMode="contain"
+                                          style={{borderRadius: 10}}
+                                        />
+                                      )}
                                     </View>
-                                  </TouchableOpacity>
+                                    <View style={{flex: 1}}>
+                                      <Text
+                                        style={{textTransform: 'capitalize'}}>
+                                        {data.name}
+                                      </Text>
+                                      {data.description && (
+                                        <Text>{data.description}</Text>
+                                      )}
+                                      <View style={{marginTop: 8}}>
+                                        <Text
+                                          style={{
+                                            fontSize: 12,
+                                            color: '#666',
+                                            fontWeight: 'bold',
+                                          }}>
+                                          Nutrients per serving:
+                                        </Text>
+                                        <View
+                                          style={{
+                                            flexDirection: 'row',
+                                            flexWrap: 'wrap',
+                                            gap: 8,
+                                            marginTop: 4,
+                                          }}>
+                                          <Text style={{fontSize: 11}}>
+                                            <Text style={{fontWeight: 'bold'}}>
+                                              Calories:
+                                            </Text>{' '}
+                                            {data.calories}g
+                                          </Text>
+                                          <Text style={{fontSize: 11}}>
+                                            <Text style={{fontWeight: 'bold'}}>
+                                              Protein:
+                                            </Text>{' '}
+                                            {data.protein}g
+                                          </Text>
+                                          <Text style={{fontSize: 11}}>
+                                            <Text style={{fontWeight: 'bold'}}>
+                                              Carbs:
+                                            </Text>{' '}
+                                            {data.carbs}g
+                                          </Text>
+                                          <Text style={{fontSize: 11}}>
+                                            <Text style={{fontWeight: 'bold'}}>
+                                              Fats:
+                                            </Text>{' '}
+                                            {data.fats}g
+                                          </Text>
+                                        </View>
+                                        <View
+                                          style={{
+                                            flexDirection: 'row',
+                                            flexWrap: 'wrap',
+                                            gap: 8,
+                                            marginTop: 2,
+                                          }}>
+                                          <Text style={{fontSize: 11}}>
+                                            <Text style={{fontWeight: 'bold'}}>
+                                              Calcium:
+                                            </Text>{' '}
+                                            {data.calcium}mg
+                                          </Text>
+                                          <Text style={{fontSize: 11}}>
+                                            <Text style={{fontWeight: 'bold'}}>
+                                              Iron:
+                                            </Text>{' '}
+                                            {data.iron}mg
+                                          </Text>
+                                          <Text style={{fontSize: 11}}>
+                                            <Text style={{fontWeight: 'bold'}}>
+                                              Folic Acid:
+                                            </Text>{' '}
+                                            {data.folic_acid}mcg
+                                          </Text>
+                                          <Text style={{fontSize: 11}}>
+                                            <Text style={{fontWeight: 'bold'}}>
+                                              Vitamin D:
+                                            </Text>{' '}
+                                            {data.vitamin_d}mcg
+                                          </Text>
+                                        </View>
+                                      </View>
+                                    </View>
+                                  </View>
                                 </View>
                               </View>
                             ))}
                           </>
-                        ) : (
-                          <Text>
-                            Seems like {woman.names} did not took any meal. Hit
-                            the plus icon at the top and start feeding him.
-                          </Text>
                         )}
-                      </>
+                      </View>
                     )}
                   </>
                 )}
               </View>
             </ScrollView>
+            {!isLoading && (
+              <View style={{padding: 10}}>
+                <Pressable
+                  onPress={handleRecordMeal}
+                  loading={isLoadingSubmitting}
+                  disabled={isLoadingSubmitting}
+                  style={{
+                    backgroundColor: colors.green,
+                    padding: 10,
+                    borderRadius: 6,
+                  }}>
+                  {isLoadingSubmitting ? (
+                    <ActivityIndicator size={20} />
+                  ) : (
+                    <Text style={{color: 'white'}}>Record Meal</Text>
+                  )}
+                </Pressable>
+              </View>
+            )}
           </View>
         </View>
 
