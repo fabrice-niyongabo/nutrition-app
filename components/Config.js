@@ -1,6 +1,6 @@
 module.exports = {
-  backendUrl: 'http://192.168.215.3:4000/api',
-  imageUrl: 'http://192.168.215.3:4000/uploads/',
+  backendUrl: 'http://192.168.210.3:4000/api',
+  imageUrl: 'http://192.168.210.3:4000/uploads/',
 };
 
 // module.exports = {

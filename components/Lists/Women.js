@@ -101,7 +101,7 @@ const Women = ({navigation}) => {
                     }}>
                     <View
                       style={{
-                        alignItems: 'center',
+                        alignItems: 'flex-start',
                         justifyContent: 'space-between',
                         flexDirection: 'row',
                         marginVertical: 10,
@@ -117,6 +117,15 @@ const Women = ({navigation}) => {
                         <Text>{woman.names}</Text>
                         <Text style={{color: '#777'}}>
                           Born {woman.day}/{woman.month}/{woman.year}
+                        </Text>
+                        <Text style={{color: '#777'}}>
+                          Pregnancy month: {woman.pregnancy_month}
+                        </Text>
+                        <Text style={{color: '#777'}}>
+                          Height: {woman.height} cm
+                        </Text>
+                        <Text style={{color: '#777'}}>
+                          Weight: {woman.weight} Kg
                         </Text>
                       </View>
                     </View>

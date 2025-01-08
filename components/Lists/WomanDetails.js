@@ -36,24 +36,18 @@ const WomanDetails = ({route, navigation}) => {
     setPregnancyMonth(month);
 
     if (userEmail != null) {
-      Axios.post(backendUrl + 'womanMealList', {userEmail, womanId: woman.id})
+      Axios.post(backendUrl + '/womenFood/recommend/' + woman.id)
         .then(res => {
-          if (isSubscribed) {
-            setIsLoading(false);
-            let rs = [];
-            for (let i = 0; i < res.data.length; i++) {
-              let data = res.data[i];
-              data.meal = JSON.parse(data.meal);
-              rs.push(data);
-            }
-            setMealList(rs);
-            setIsLoading(false);
-          }
+          setMealList(res.data);
+          console.log(res.data);
         })
         .catch(error => {
           // console.log(error);
           ToastAndroid.show(error.message, ToastAndroid.SHORT);
           // alert(error);
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     }
 
@@ -61,7 +55,7 @@ const WomanDetails = ({route, navigation}) => {
     return () => {
       isSubscribed = false;
     };
-  }, [woman, mealList]);
+  }, [woman]);
 
   const handleDelete = id => {
     Axios.post(backendUrl + 'deleteWomanMeal', {
@@ -158,7 +152,7 @@ const WomanDetails = ({route, navigation}) => {
                 }}>
                 <Text
                   style={{fontSize: 20, color: colors.blue, marginBottom: 10}}>
-                  Meals taken by {woman.names}
+                  Foods recommended for {woman.names}
                 </Text>
 
                 {(pregnancyMonth == 0 || pregnancyMonth > 9) && !isLoading ? (
