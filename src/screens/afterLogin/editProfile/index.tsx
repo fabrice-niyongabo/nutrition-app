@@ -11,43 +11,57 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNRestart from 'react-native-restart';
 import Axios from 'axios';
 import {COLORS} from '../../../constants/colors';
+import {INavigationProp} from '../../../types/navigation';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../../redux/reducers';
+import {errorHandler, toastMessage} from '../../../utils/helpers';
+import {APP} from '../../../constants/app';
 
-const EditProfile = ({route, navigation}) => {
-  const {names, userEmail} = route.params;
-  const [userNames, setUserNames] = useState(names);
+const EditProfile = ({}: INavigationProp) => {
+  const {user, token} = useSelector((state: RootState) => state.userReducer);
+  const [userNames, setUserNames] = useState(user?.names || '');
   const [isSaving, setIsSaving] = useState(false);
 
-  const userNamesRef = useRef(null);
+  const userNamesRef = useRef<TextInput | null>(null);
 
   const handleSubmit = () => {
     setIsSaving(true);
     if (userNames.trim() === '') {
-      alert('Please enter your names');
+      toastMessage('error', 'Please enter your names');
       setIsSaving(false);
-      userNamesRef.current.focus();
-    } else if (userEmail == '' || userEmail == null) {
-      alert('Invalid user email');
+      userNamesRef?.current && userNamesRef.current.focus();
     } else {
-      Axios.post(backendUrl + 'updateNames', {userEmail, userNames})
+      Axios.put(
+        APP.backendUrl + 'profile/names',
+        {userNames},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
         .then(res => {
           if (res.data.type === 'message') {
             setIsSaving(false);
             AsyncStorage.setItem('user_names', userNames);
             RNRestart.Restart();
           } else {
-            alert(`${res.data.msg}. ${JSON.stringify(res.data.error)}`);
+            toastMessage(
+              'error',
+              `${res.data.msg}. ${JSON.stringify(res.data.error)}`,
+            );
             setIsSaving(false);
           }
         })
         .catch(error => {
-          alert(error);
+          errorHandler(error);
           setIsSaving(false);
         });
     }
   };
 
   useEffect(() => {
-    userNamesRef.current.focus();
+    userNamesRef?.current && userNamesRef.current.focus();
   }, []);
 
   return (

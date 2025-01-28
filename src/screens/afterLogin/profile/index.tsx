@@ -7,44 +7,26 @@ import {
   StyleSheet,
   TextInput,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/dist/FontAwesome';
-import Icon2 from 'react-native-vector-icons/dist/Entypo';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon2 from 'react-native-vector-icons/Entypo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNRestart from 'react-native-restart';
 import {COLORS} from '../../../constants/colors';
+import {INavigationProp} from '../../../types/navigation';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../../redux/reducers';
+import {setChildren} from '../../../redux/actions/children';
+import {setWomen} from '../../../redux/actions/women';
+import {resetUser} from '../../../redux/actions/user';
 
-const Profile = ({navigation}) => {
-  const [userEmail, setUserEmail] = useState(null);
-  const [userNames, setUserNames] = useState(null);
-  const [gotLoginDetails, setGotLoginDetails] = useState(false);
-
-  useEffect(() => {
-    let isSubscribed = true;
-    if (isSubscribed) {
-      AsyncStorage.getItem('user_email').then(value => {
-        if (value != null) {
-          setUserEmail(value);
-        }
-        setGotLoginDetails(true);
-      });
-
-      AsyncStorage.getItem('user_names').then(value => {
-        if (value != null) {
-          setUserNames(value);
-        }
-      });
-    }
-
-    //cancel subscriptions
-    return () => {
-      isSubscribed = false;
-    };
-  });
+const Profile = ({navigation}: INavigationProp) => {
+  const dispatch = useDispatch();
+  const {user} = useSelector((state: RootState) => state.userReducer);
 
   const handleLogout = () => {
-    AsyncStorage.removeItem('user_email');
-    AsyncStorage.removeItem('user_names');
-    RNRestart.Restart();
+    dispatch(setChildren([]));
+    dispatch(setWomen([]));
+    dispatch(resetUser());
   };
   return (
     <SafeAreaView>
@@ -71,11 +53,8 @@ const Profile = ({navigation}) => {
             justifyContent: 'space-between',
             flexDirection: 'row',
           }}>
-          <Text>{userNames}</Text>
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('EditNames', {names: userNames, userEmail})
-            }>
+          <Text>{user?.names}</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('EditNames')}>
             <Icon2 name="edit" size={20} />
           </TouchableOpacity>
         </View>
@@ -83,7 +62,7 @@ const Profile = ({navigation}) => {
           style={{
             marginVertical: 15,
           }}>
-          <Text>{userEmail}</Text>
+          <Text>{user?.email}</Text>
         </View>
         <TouchableOpacity
           style={{marginVertical: 40}}
