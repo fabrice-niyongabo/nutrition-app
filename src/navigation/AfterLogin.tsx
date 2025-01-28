@@ -9,6 +9,9 @@ import EditProfile from '../screens/afterLogin/editProfile';
 import Notifications from '../screens/afterLogin/notifications';
 import ChildList from '../screens/afterLogin/lists/child';
 import WomenList from '../screens/afterLogin/lists/woman';
+import ChildDetails from '../screens/afterLogin/childDetails';
+import Prediction from '../screens/afterLogin/Prediction';
+import WomanDetails from '../screens/afterLogin/womanDetails';
 
 const Stack = createNativeStackNavigator();
 const AfterLogin = () => {
@@ -95,6 +98,37 @@ const AfterLogin = () => {
             title: 'Registered Children',
             headerTintColor: 'white',
             headerStyle: {backgroundColor: COLORS.green},
+          }}
+        />
+        <Stack.Screen
+          name="ChildDetails"
+          component={ChildDetails}
+          options={{
+            title: 'Child Meal Recommendation',
+            headerTintColor: 'white',
+            headerStyle: {backgroundColor: COLORS.green},
+            // headerTransparent: true,
+            // headerShadowVisible: false,
+            headerBackVisible: false,
+          }}
+        />
+        <Stack.Screen
+          name="Prediction"
+          component={Prediction}
+          options={{
+            title: 'Health Status Prediction',
+            headerTintColor: 'white',
+            headerStyle: {backgroundColor: COLORS.green},
+          }}
+        />
+        <Stack.Screen
+          name="WomanDetails"
+          component={WomanDetails}
+          options={{
+            title: 'Woman Meal Details',
+            headerTintColor: 'white',
+            headerStyle: {backgroundColor: COLORS.green},
+            headerBackVisible: false,
           }}
         />
       </Stack.Navigator>
