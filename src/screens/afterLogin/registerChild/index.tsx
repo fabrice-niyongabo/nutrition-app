@@ -10,15 +10,17 @@ import {
   ToastAndroid,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import PushNotification from 'react-native-push-notification';
 import Axios from 'axios';
 import {COLORS} from '../../../constants/colors';
+import {INavigationProp} from '../../../types/navigation';
+import {errorHandler, toastMessage} from '../../../utils/helpers';
+import {APP} from '../../../constants/app';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../../redux/reducers';
 
-const RegisterChild = ({navigation}) => {
+const RegisterChild = ({navigation}: INavigationProp) => {
+  const {user, token} = useSelector((state: RootState) => state.userReducer);
   const [isRegistering, setIsRegistering] = useState(false);
-  const [gotLoginDetails, setGotLoginDetails] = useState(false);
-  const [userEmail, setUserEmail] = useState(null);
-  const [token, setToken] = useState(null);
   const [day, setDay] = useState('');
   const [month, setMonth] = useState('');
   const [year, setYear] = useState('');
@@ -26,37 +28,10 @@ const RegisterChild = ({navigation}) => {
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
 
-  useEffect(() => {
-    let isSubscribed = true;
-
-    AsyncStorage.getItem('user_email').then(value => {
-      if (isSubscribed) {
-        if (value != null) {
-          setUserEmail(value);
-        }
-        setGotLoginDetails(true);
-      }
-    });
-
-    AsyncStorage.getItem('token').then(value => {
-      if (isSubscribed) {
-        if (value != null) {
-          setToken(value);
-        }
-        setGotLoginDetails(true);
-      }
-    });
-
-    //cancel all subscriptions
-    return () => {
-      isSubscribed = false;
-    };
-  });
-
   const handleRegister = () => {
     if (names.trim() == '') {
       setNames('');
-      alert('Please provide name');
+      toastMessage('error', 'Please provide name');
       return;
     }
 
@@ -67,12 +42,12 @@ const RegisterChild = ({navigation}) => {
         setDay(dayFormat);
       } else {
         setDay('');
-        alert('Invalid day of birth');
+        toastMessage('error', 'Invalid day of birth');
         return;
       }
     } else {
       setDay('');
-      alert('Invalid day');
+      toastMessage('error', 'Invalid day');
       return;
     }
 
@@ -83,12 +58,12 @@ const RegisterChild = ({navigation}) => {
         setMonth(dayFormat);
       } else {
         setMonth('');
-        alert('Invalid month');
+        toastMessage('error', 'Invalid month');
         return;
       }
     } else {
       setMonth('');
-      alert('Invalid month');
+      toastMessage('error', 'Invalid month');
       return;
     }
 
@@ -98,18 +73,19 @@ const RegisterChild = ({navigation}) => {
       let y = today.getFullYear();
       if (numberFormat < y - 5) {
         setYear('');
-        alert(
+        toastMessage(
+          'error',
           'Invalid year.\nThis app is designed for child with age less or equal to 5',
         );
         return;
       } else if (numberFormat > y) {
         setYear('');
-        alert('Invalid Year');
+        toastMessage('error', 'Invalid Year');
         return;
       }
     } else {
       setYear('');
-      alert('Invalid year');
+      toastMessage('error', 'Invalid year');
       return;
     }
 
@@ -117,7 +93,7 @@ const RegisterChild = ({navigation}) => {
       setHeight(height);
     } else {
       setHeight('');
-      alert('Invalid height');
+      toastMessage('error', 'Invalid height');
       return;
     }
 
@@ -125,19 +101,19 @@ const RegisterChild = ({navigation}) => {
       setWeight(weight);
     } else {
       setWeight('');
-      alert('Invalid weight');
+      toastMessage('error', 'Invalid weight');
       return;
     }
 
     setIsRegistering(true);
     Axios.post(
-      backendUrl + '/children',
+      APP.backendUrl + '/children',
       {
         names,
         day,
         month,
         year,
-        userEmail,
+        userEmail: user?.email,
         height,
         weight,
       },
@@ -148,74 +124,14 @@ const RegisterChild = ({navigation}) => {
       },
     )
       .then(res => {
-        // alert(res.data.msg);
-        PushNotification.localNotification({
-          channelId: 'notification-channel',
-          title: 'Congratulations',
-          message: `${names} has been registered to our app successfully.`,
-          allowWhileIdle: true,
-          vibrate: true,
-        });
-        setIsRegistering(false);
         navigation.navigate('Child');
       })
       .catch(error => {
-        ToastAndroid.show(returnError(error), ToastAndroid.SHORT);
+        errorHandler(error);
       })
       .finally(() => {
         setIsRegistering(false);
       });
-  };
-
-  const registerButton = () => {
-    if (gotLoginDetails && userEmail != null) {
-      if (isRegistering) {
-        return (
-          <View
-            style={{
-              backgroundColor: COLORS.green,
-              padding: 15,
-              borderRadius: 5,
-              opacity: 0.7,
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexDirection: 'row',
-            }}>
-            <ActivityIndicator color="white" />
-            <Text style={{textAlign: 'center', color: 'white'}}>
-              Registering child
-            </Text>
-          </View>
-        );
-      } else {
-        return (
-          <TouchableNativeFeedback onPress={handleRegister}>
-            <View
-              style={{
-                backgroundColor: COLORS.green,
-                padding: 15,
-                borderRadius: 5,
-              }}>
-              <Text style={{textAlign: 'center', color: 'white'}}>
-                REGISTER
-              </Text>
-            </View>
-          </TouchableNativeFeedback>
-        );
-      }
-    } else {
-      return (
-        <View
-          style={{
-            backgroundColor: COLORS.green,
-            padding: 15,
-            borderRadius: 5,
-            opacity: 0.5,
-          }}>
-          <Text style={{textAlign: 'center', color: 'white'}}>REGISTER</Text>
-        </View>
-      );
-    }
   };
 
   return (
@@ -297,7 +213,38 @@ const RegisterChild = ({navigation}) => {
             />
           </View>
 
-          <View style={{marginTop: 15}}>{registerButton()}</View>
+          <View style={{marginTop: 15}}>
+            {isRegistering ? (
+              <View
+                style={{
+                  backgroundColor: COLORS.green,
+                  padding: 15,
+                  borderRadius: 5,
+                  opacity: 0.7,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexDirection: 'row',
+                }}>
+                <ActivityIndicator color="white" />
+                <Text style={{textAlign: 'center', color: 'white'}}>
+                  Registering child
+                </Text>
+              </View>
+            ) : (
+              <TouchableNativeFeedback onPress={handleRegister}>
+                <View
+                  style={{
+                    backgroundColor: COLORS.green,
+                    padding: 15,
+                    borderRadius: 5,
+                  }}>
+                  <Text style={{textAlign: 'center', color: 'white'}}>
+                    REGISTER
+                  </Text>
+                </View>
+              </TouchableNativeFeedback>
+            )}
+          </View>
         </View>
       </View>
     </SafeAreaView>
