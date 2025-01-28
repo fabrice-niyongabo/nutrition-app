@@ -9,12 +9,9 @@ import {
   ActivityIndicator,
   ToastAndroid,
 } from 'react-native';
-import colors from '../colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PushNotification from 'react-native-push-notification';
-import {backendUrl} from '../Config';
 import Axios from 'axios';
-import {returnError} from '../util';
 
 const RegisterChild = ({navigation}) => {
   const [isRegistering, setIsRegistering] = useState(false);

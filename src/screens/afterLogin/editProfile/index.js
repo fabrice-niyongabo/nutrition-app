@@ -7,11 +7,10 @@ import {
   TextInput,
   ActivityIndicator,
 } from 'react-native';
-import colors from '../colors';
-import {backendUrl} from '../Config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNRestart from 'react-native-restart';
 import Axios from 'axios';
+import {COLORS} from '../../../constants/colors';
 
 const EditProfile = ({route, navigation}) => {
   const {names, userEmail} = route.params;
@@ -61,7 +60,7 @@ const EditProfile = ({route, navigation}) => {
           <TextInput
             placeholder="Enter your names"
             value={userNames}
-            style={{borderBottomColor: colors.gray, borderBottomWidth: 2}}
+            style={{borderBottomColor: COLORS.gray, borderBottomWidth: 2}}
             ref={userNamesRef}
             onChangeText={text => {
               setUserNames(text);
@@ -72,7 +71,7 @@ const EditProfile = ({route, navigation}) => {
         {isSaving ? (
           <View
             style={{
-              backgroundColor: colors.green,
+              backgroundColor: COLORS.green,
               borderRadius: 50,
               paddingVertical: 15,
               marginVertical: 30,
@@ -88,7 +87,7 @@ const EditProfile = ({route, navigation}) => {
           <TouchableNativeFeedback onPress={handleSubmit}>
             <View
               style={{
-                backgroundColor: colors.green,
+                backgroundColor: COLORS.green,
                 borderRadius: 50,
                 paddingVertical: 15,
                 marginTop: 30,

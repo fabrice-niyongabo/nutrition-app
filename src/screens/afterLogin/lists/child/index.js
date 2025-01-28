@@ -10,13 +10,11 @@ import {
   TouchableOpacity,
   ToastAndroid,
 } from 'react-native';
-import colors from '../colors';
 import Axios from 'axios';
 
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {backendUrl} from '../Config';
-import {returnError} from '../util';
+import {COLORS} from '../../../../constants/colors';
 
 const width = Dimensions.get('window').width;
 
@@ -97,13 +95,13 @@ const ChildList = ({navigation}) => {
     if (!gotLoginDetails) {
       return (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          <ActivityIndicator color={colors.green} size="large" />
+          <ActivityIndicator color={COLORS.green} size="large" />
         </View>
       );
     } else if (isLoading) {
       return (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          <ActivityIndicator color={colors.green} size="large" />
+          <ActivityIndicator color={COLORS.green} size="large" />
         </View>
       );
     } else {
@@ -124,7 +122,7 @@ const ChildList = ({navigation}) => {
                         justifyContent: 'space-between',
                         flexDirection: 'row',
                         marginVertical: 10,
-                        backgroundColor: colors.gray3,
+                        backgroundColor: COLORS.gray3,
                         padding: 10,
                         borderRadius: 10,
                       }}>
@@ -149,7 +147,7 @@ const ChildList = ({navigation}) => {
                             flexDirection: 'row',
                             width: 40,
                           }}>
-                          <Icon name="trash" size={20} color={colors.green} />
+                          <Icon name="trash" size={20} color={COLORS.green} />
                         </View>
                       </TouchableNativeFeedback> */}
                     </View>
@@ -157,7 +155,7 @@ const ChildList = ({navigation}) => {
                 );
               })
             ) : (
-              <Text style={{color: colors.gray, fontSize: 20}}>
+              <Text style={{color: COLORS.gray, fontSize: 20}}>
                 No child registered yet
               </Text>
             )}
@@ -178,7 +176,7 @@ const ChildList = ({navigation}) => {
             position: 'absolute',
             bottom: 0,
             width: width,
-            backgroundColor: colors.green,
+            backgroundColor: COLORS.green,
             alignItems: 'center',
             justifyContent: 'space-between',
             flexDirection: 'row',

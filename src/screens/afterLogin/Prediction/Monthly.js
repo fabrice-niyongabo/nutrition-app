@@ -1,9 +1,6 @@
 import {View, Text, ActivityIndicator, ToastAndroid} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import {backendUrl} from '../Config';
-import {returnError} from '../util';
-import colors from '../colors';
 
 const Monthly = ({child}) => {
   const [analysisData, setAnalysisData] = useState(null);

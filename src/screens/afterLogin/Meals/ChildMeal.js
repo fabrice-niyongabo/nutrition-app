@@ -9,7 +9,6 @@ import {
   Image,
   ToastAndroid,
 } from 'react-native';
-import colors from '../colors';
 import Axios from 'axios';
 
 import Icon from 'react-native-vector-icons/dist/FontAwesome';

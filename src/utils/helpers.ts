@@ -6,9 +6,7 @@ export const toastMessage = (
   message: string,
   title: string | undefined = undefined,
 ) => {
-  const customTitle = type.charAt(0).toUpperCase() + type.slice(1);
   Notifier.showNotification({
-    // title: title ? title : customTitle,
     description: message,
     Component: NotifierComponents.Alert,
     duration: 4000,

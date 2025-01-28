@@ -9,9 +9,6 @@ import {
 import React, {useState, useEffect} from 'react';
 import {LineChart} from 'react-native-chart-kit';
 import axios from 'axios';
-import {backendUrl} from '../Config';
-import {returnError} from '../util';
-import colors from '../colors';
 import Monthly from './Monthly';
 
 const Prediction = ({route, navigation}) => {

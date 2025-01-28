@@ -10,7 +10,6 @@ import {
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import Icon2 from 'react-native-vector-icons/dist/Entypo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import colors from '../colors';
 import RNRestart from 'react-native-restart';
 
 const Profile = ({navigation}) => {

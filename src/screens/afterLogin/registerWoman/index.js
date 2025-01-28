@@ -8,12 +8,8 @@ import {
   TouchableNativeFeedback,
   ActivityIndicator,
 } from 'react-native';
-import colors from '../colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {backendUrl} from '../Config';
 import Axios from 'axios';
-import PushNotification from 'react-native-push-notification';
-import {returnError} from '../util';
 
 const RegisterWoman = ({navigation}) => {
   const [isRegistering, setIsRegistering] = useState(false);

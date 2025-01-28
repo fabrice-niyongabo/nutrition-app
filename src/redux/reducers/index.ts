@@ -1,7 +1,7 @@
-import { combineReducers } from "redux";
-import notificationsReducer from "./notifications";
+import {combineReducers} from 'redux';
+import userReducer from './user';
 const rootReducer = combineReducers({
-  notificationsReducer,
+  userReducer,
 });
 
 export default rootReducer;

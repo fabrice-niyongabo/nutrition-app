@@ -12,13 +12,11 @@ import {
   ActivityIndicator,
   ToastAndroid,
 } from 'react-native';
-import colors from '../colors';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Axios from 'axios';
 import PushNotification from 'react-native-push-notification';
-import {backendUrl} from '../Config';
-import {returnError} from '../util';
+import {COLORS} from '../../../constants/colors';
 
 const width = Dimensions.get('window').width;
 
@@ -106,9 +104,9 @@ const Dashboard = ({navigation}) => {
 
   return (
     <SafeAreaView>
-      <StatusBar backgroundColor={colors.green} />
+      <StatusBar backgroundColor={COLORS.green} />
       <ImageBackground
-        source={require('../../assets/img/9.jpg')}
+        source={require('../../../assets/img/9.jpg')}
         resizeMode="cover"
         style={{height: '100%', width: '100%'}}>
         <View
@@ -125,7 +123,7 @@ const Dashboard = ({navigation}) => {
               style={{
                 marginTop: 10,
               }}>
-              <Text style={{fontSize: 16, color: colors.gray2}}>
+              <Text style={{fontSize: 16, color: COLORS.gray2}}>
                 Welcome to the world of nutrients!
               </Text>
             </View>
@@ -149,21 +147,21 @@ const Dashboard = ({navigation}) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}>
-                  <Icon name="female" size={30} color={colors.blue} />
+                  <Icon name="female" size={30} color={COLORS.blue} />
                   {isLoadingWomen ? (
-                    <ActivityIndicator size={30} color={colors.blue} />
+                    <ActivityIndicator size={30} color={COLORS.blue} />
                   ) : (
                     <Text
                       style={{
                         marginTop: 10,
                         fontWeight: 'bold',
                         fontSize: 30,
-                        color: colors.blue,
+                        color: COLORS.blue,
                       }}>
                       {women.length}
                     </Text>
                   )}
-                  <Text style={{color: colors.blue, fontSize: 18}}>Women</Text>
+                  <Text style={{color: COLORS.blue, fontSize: 18}}>Women</Text>
                 </View>
               </TouchableNativeFeedback>
               <TouchableNativeFeedback
@@ -179,13 +177,13 @@ const Dashboard = ({navigation}) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}>
-                  <Icon size={30} name="child" color={colors.brown} />
+                  <Icon size={30} name="child" color={COLORS.brown} />
                   {isLoadingChildren ? (
-                    <ActivityIndicator size={30} color={colors.brown} />
+                    <ActivityIndicator size={30} color={COLORS.brown} />
                   ) : (
                     <Text
                       style={{
-                        color: colors.brown,
+                        color: COLORS.brown,
                         fontSize: 30,
                         fontWeight: 'bold',
                         marginTop: 10,
@@ -193,7 +191,7 @@ const Dashboard = ({navigation}) => {
                       {children.length}
                     </Text>
                   )}
-                  <Text style={{color: colors.brown}}>Children</Text>
+                  <Text style={{color: COLORS.brown}}>Children</Text>
                 </View>
               </TouchableNativeFeedback>
             </View>
@@ -208,7 +206,7 @@ const Dashboard = ({navigation}) => {
                     padding: 15,
                     borderRadius: 7,
                   }}>
-                  <Text style={{textAlign: 'center', color: colors.brown}}>
+                  <Text style={{textAlign: 'center', color: COLORS.brown}}>
                     Register Child
                   </Text>
                 </View>
@@ -222,7 +220,7 @@ const Dashboard = ({navigation}) => {
                     borderRadius: 7,
                     padding: 15,
                   }}>
-                  <Text style={{textAlign: 'center', color: colors.blue}}>
+                  <Text style={{textAlign: 'center', color: COLORS.blue}}>
                     Register Woman
                   </Text>
                 </View>
@@ -236,7 +234,7 @@ const Dashboard = ({navigation}) => {
               position: 'absolute',
               bottom: 0,
               width: width,
-              backgroundColor: colors.green,
+              backgroundColor: COLORS.green,
               alignItems: 'center',
               justifyContent: 'space-between',
               flexDirection: 'row',
@@ -246,7 +244,7 @@ const Dashboard = ({navigation}) => {
             <TouchableOpacity>
               <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <Icon name="home" size={20} color="brown" />
-                <Text style={{color: colors.brown, fontSize: 10}}>Home</Text>
+                <Text style={{color: COLORS.brown, fontSize: 10}}>Home</Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity

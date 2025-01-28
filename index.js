@@ -22,13 +22,15 @@ import {store, persistor} from './src/redux/store';
 
 const Main = () => {
   return (
-    <Provider store={store}>
-      <PersistGate persistor={persistor}>
-        <NotifierWrapper translucentStatusBar>
-          <App />
-        </NotifierWrapper>
-      </PersistGate>
-    </Provider>
+    <GestureHandlerRootView style={{flex: 1}}>
+      <Provider store={store}>
+        <PersistGate persistor={persistor}>
+          <NotifierWrapper translucentStatusBar>
+            <App />
+          </NotifierWrapper>
+        </PersistGate>
+      </Provider>
+    </GestureHandlerRootView>
   );
 };
 
