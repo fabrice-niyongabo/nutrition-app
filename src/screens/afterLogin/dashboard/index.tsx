@@ -6,101 +6,31 @@ import {
   TouchableOpacity,
   ImageBackground,
   StatusBar,
-  ScrollView,
   Dimensions,
   TouchableNativeFeedback,
   ActivityIndicator,
-  ToastAndroid,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/dist/FontAwesome';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Axios from 'axios';
-import PushNotification from 'react-native-push-notification';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import {COLORS} from '../../../constants/colors';
+import {INavigationProp} from '../../../types/navigation';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../../redux/reducers';
+import {fetchWomen} from '../../../redux/actions/women';
+import {fetchChildren} from '../../../redux/actions/children';
 
 const width = Dimensions.get('window').width;
 
-const Dashboard = ({navigation}) => {
-  const [women, setWomen] = useState([]);
-  const [womenMealHistory, setWomenMealHistory] = useState([]);
-  const [children, setChildren] = useState([]);
-  const [childrenMealHistory, setChildrenMealHistory] = useState([]);
-  const [isLoadingChildren, setIsLoadingChildren] = useState(true);
-  const [isLoadingWomen, setIsLoadingWomen] = useState(true);
-  const [userEmail, setUserEmail] = useState(null);
-  const [token, setToken] = useState(null);
-  const [isShowingNotification, setIsShowingNotification] = useState(false);
-  const today = new Date();
-
-  const createChannels = () => {
-    PushNotification.createChannel({
-      channelId: 'notification-channel',
-      channelName: 'app channel',
-    });
-  };
+const Dashboard = ({navigation}: INavigationProp) => {
+  const dispatch = useDispatch();
+  const womenReducer = useSelector((state: RootState) => state.womenReducer);
+  const childrenReducer = useSelector(
+    (state: RootState) => state.childrenReducer,
+  );
 
   useEffect(() => {
-    createChannels();
+    dispatch(fetchChildren());
+    dispatch(fetchWomen());
   }, []);
-
-  useEffect(() => {
-    let isSubscribed = true;
-
-    AsyncStorage.getItem('user_email').then(value => {
-      if (isSubscribed) {
-        if (value != null) {
-          setUserEmail(value);
-        }
-      }
-    });
-
-    AsyncStorage.getItem('token').then(value => {
-      if (isSubscribed) {
-        if (value != null) {
-          setToken(value);
-        }
-      }
-    });
-
-    if (token != null) {
-      Axios.get(backendUrl + '/women', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then(res => {
-          setIsLoadingWomen(false);
-          setWomen(res.data.women);
-        })
-        .catch(error => {
-          ToastAndroid.show(error.message, ToastAndroid.SHORT);
-        })
-        .finally(() => {
-          setIsLoadingWomen(false);
-        });
-
-      Axios.get(backendUrl + '/children', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then(res => {
-          setIsLoadingChildren(false);
-          setChildren(res.data.children);
-        })
-        .catch(error => {
-          ToastAndroid.show(returnError(error), ToastAndroid.SHORT);
-        })
-        .finally(() => {
-          setIsLoadingChildren(false);
-        });
-    }
-
-    //cancel all subscriptions
-    return () => {
-      isSubscribed = false;
-    };
-  }, [token]);
 
   return (
     <SafeAreaView>
@@ -148,7 +78,7 @@ const Dashboard = ({navigation}) => {
                     justifyContent: 'center',
                   }}>
                   <Icon name="female" size={30} color={COLORS.blue} />
-                  {isLoadingWomen ? (
+                  {womenReducer.isLoading ? (
                     <ActivityIndicator size={30} color={COLORS.blue} />
                   ) : (
                     <Text
@@ -158,7 +88,7 @@ const Dashboard = ({navigation}) => {
                         fontSize: 30,
                         color: COLORS.blue,
                       }}>
-                      {women.length}
+                      {womenReducer.women.length}
                     </Text>
                   )}
                   <Text style={{color: COLORS.blue, fontSize: 18}}>Women</Text>
@@ -178,7 +108,7 @@ const Dashboard = ({navigation}) => {
                     justifyContent: 'center',
                   }}>
                   <Icon size={30} name="child" color={COLORS.brown} />
-                  {isLoadingChildren ? (
+                  {childrenReducer.isLoading ? (
                     <ActivityIndicator size={30} color={COLORS.brown} />
                   ) : (
                     <Text
@@ -188,7 +118,7 @@ const Dashboard = ({navigation}) => {
                         fontWeight: 'bold',
                         marginTop: 10,
                       }}>
-                      {children.length}
+                      {childrenReducer.children.length}
                     </Text>
                   )}
                   <Text style={{color: COLORS.brown}}>Children</Text>

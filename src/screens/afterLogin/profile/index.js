@@ -11,6 +11,7 @@ import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import Icon2 from 'react-native-vector-icons/dist/Entypo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNRestart from 'react-native-restart';
+import {COLORS} from '../../../constants/colors';
 
 const Profile = ({navigation}) => {
   const [userEmail, setUserEmail] = useState(null);
@@ -89,7 +90,7 @@ const Profile = ({navigation}) => {
           onPress={() => handleLogout()}>
           <View
             style={{
-              backgroundColor: colors.green,
+              backgroundColor: COLORS.green,
               borderRadius: 50,
               paddingVertical: 15,
             }}>
@@ -103,7 +104,7 @@ const Profile = ({navigation}) => {
 
 const styles = StyleSheet.create({
   headerContainer: {
-    backgroundColor: colors.green,
+    backgroundColor: COLORS.green,
     height: 200,
     width: '100%',
     transform: [{scaleX: 2}],
@@ -132,7 +133,7 @@ const styles = StyleSheet.create({
     height: 50,
   },
   input: {
-    borderBottomColor: colors.gray,
+    borderBottomColor: COLORS.gray,
     borderBottomWidth: 3,
     paddingLeft: 40,
     height: 50,

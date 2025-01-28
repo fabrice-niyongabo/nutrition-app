@@ -3,7 +3,7 @@ import {SafeAreaView} from 'react-native';
 import {useSelector} from 'react-redux';
 import {RootState} from './src/redux/reducers';
 import BeforeLogin from './src/navigation/BeforeLogin';
-import {AfterLogin} from './src/navigation/AfterLogin';
+import AfterLogin from './src/navigation/AfterLogin';
 
 const App = () => {
   const {token} = useSelector((state: RootState) => state.userReducer);

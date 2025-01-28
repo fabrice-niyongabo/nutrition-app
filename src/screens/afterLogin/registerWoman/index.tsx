@@ -10,12 +10,17 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Axios from 'axios';
+import {COLORS} from '../../../constants/colors';
+import {INavigationProp} from '../../../types/navigation';
+import {errorHandler, toastMessage} from '../../../utils/helpers';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../../redux/reducers';
+import {APP} from '../../../constants/app';
 
-const RegisterWoman = ({navigation}) => {
+const RegisterWoman = ({navigation}: INavigationProp) => {
+  const {user, token} = useSelector((state: RootState) => state.userReducer);
   const [isRegistering, setIsRegistering] = useState(false);
   const [gotLoginDetails, setGotLoginDetails] = useState(false);
-  const [userEmail, setUserEmail] = useState(null);
-  const [token, setToken] = useState(null);
   const [pregnancyMonth, setPregnancyMonth] = useState('');
   const [day, setDay] = useState('');
   const [month, setMonth] = useState('');
@@ -24,34 +29,10 @@ const RegisterWoman = ({navigation}) => {
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
 
-  useEffect(() => {
-    let isSubscribed = true;
-
-    AsyncStorage.getItem('user_email').then(value => {
-      if (isSubscribed) {
-        if (value != null) {
-          setUserEmail(value);
-        }
-        setGotLoginDetails(true);
-      }
-    });
-
-    AsyncStorage.getItem('token').then(value => {
-      if (value != null) {
-        setToken(value);
-      }
-    });
-
-    //cancel all subscriptions
-    return () => {
-      isSubscribed = false;
-    };
-  }, []);
-
   const handleRegister = () => {
     if (names.trim() == '') {
       setNames('');
-      alert('Please provide name');
+      toastMessage('error', 'Please provide name');
       return;
     }
     if (pregnancyMonth.trim() != '') {
@@ -61,12 +42,12 @@ const RegisterWoman = ({navigation}) => {
         setPregnancyMonth(dayFormat);
       } else {
         setPregnancyMonth('');
-        alert('Invalid pregnancy month');
+        toastMessage('error', 'Invalid pregnancy month');
         return;
       }
     } else {
       setPregnancyMonth('');
-      alert('Invalid pregnancy month');
+      toastMessage('error', 'Invalid pregnancy month');
       return;
     }
 
@@ -77,12 +58,12 @@ const RegisterWoman = ({navigation}) => {
         setDay(dayFormat);
       } else {
         setDay('');
-        alert('Invalid day of birth');
+        toastMessage('error', 'Invalid day of birth');
         return;
       }
     } else {
       setDay('');
-      alert('Invalid day');
+      toastMessage('error', 'Invalid day');
       return;
     }
 
@@ -93,12 +74,12 @@ const RegisterWoman = ({navigation}) => {
         setMonth(dayFormat);
       } else {
         setMonth('');
-        alert('Invalid month');
+        toastMessage('error', 'Invalid month');
         return;
       }
     } else {
       setMonth('');
-      alert('Invalid month');
+      toastMessage('error', 'Invalid month');
       return;
     }
 
@@ -108,11 +89,15 @@ const RegisterWoman = ({navigation}) => {
       let y = today.getFullYear();
       if (numberFormat < y - 40) {
         setYear('');
-        alert('Invalid year.\nValid year starts from at least ' + (y - 40));
+        toastMessage(
+          'error',
+          'Invalid year.\nValid year starts from at least ' + (y - 40),
+        );
         return;
       } else if (numberFormat > y - 15) {
         setYear('');
-        alert(
+        toastMessage(
+          'error',
           'Invalid Year. Valid year must be in range of ' +
             (y - 40) +
             '-' +
@@ -122,7 +107,7 @@ const RegisterWoman = ({navigation}) => {
       }
     } else {
       setYear('');
-      alert('Invalid year');
+      toastMessage('error', 'Invalid year');
       return;
     }
 
@@ -130,7 +115,7 @@ const RegisterWoman = ({navigation}) => {
       setHeight(height);
     } else {
       setHeight('');
-      alert('Invalid height');
+      toastMessage('error', 'Invalid height');
       return;
     }
 
@@ -138,19 +123,19 @@ const RegisterWoman = ({navigation}) => {
       setWeight(weight);
     } else {
       setWeight('');
-      alert('Invalid weight');
+      toastMessage('error', 'Invalid weight');
       return;
     }
 
     setIsRegistering(true);
     Axios.post(
-      backendUrl + '/women',
+      APP.backendUrl + '/women',
       {
         names,
         day,
         month,
         year,
-        userEmail,
+        userEmail: user?.email,
         pregnancyMonth,
         height,
         weight,
@@ -167,7 +152,7 @@ const RegisterWoman = ({navigation}) => {
         navigation.navigate('Women');
       })
       .catch(error => {
-        alert(returnError(error));
+        errorHandler(error);
       })
       .finally(() => {
         setIsRegistering(false);
@@ -175,52 +160,36 @@ const RegisterWoman = ({navigation}) => {
   };
 
   const registerButton = () => {
-    if (gotLoginDetails && userEmail != null) {
-      if (isRegistering) {
-        return (
-          <View
-            style={{
-              backgroundColor: colors.green,
-              padding: 15,
-              borderRadius: 5,
-              opacity: 0.7,
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexDirection: 'row',
-            }}>
-            <ActivityIndicator color="white" />
-            <Text style={{textAlign: 'center', color: 'white'}}>
-              Registering woman
-            </Text>
-          </View>
-        );
-      } else {
-        return (
-          <TouchableNativeFeedback onPress={handleRegister}>
-            <View
-              style={{
-                backgroundColor: colors.green,
-                padding: 15,
-                borderRadius: 5,
-              }}>
-              <Text style={{textAlign: 'center', color: 'white'}}>
-                REGISTER
-              </Text>
-            </View>
-          </TouchableNativeFeedback>
-        );
-      }
-    } else {
+    if (isRegistering) {
       return (
         <View
           style={{
-            backgroundColor: colors.green,
+            backgroundColor: COLORS.green,
             padding: 15,
             borderRadius: 5,
-            opacity: 0.5,
+            opacity: 0.7,
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'row',
           }}>
-          <Text style={{textAlign: 'center', color: 'white'}}>REGISTER</Text>
+          <ActivityIndicator color="white" />
+          <Text style={{textAlign: 'center', color: 'white'}}>
+            Registering woman
+          </Text>
         </View>
+      );
+    } else {
+      return (
+        <TouchableNativeFeedback onPress={handleRegister}>
+          <View
+            style={{
+              backgroundColor: COLORS.green,
+              padding: 15,
+              borderRadius: 5,
+            }}>
+            <Text style={{textAlign: 'center', color: 'white'}}>REGISTER</Text>
+          </View>
+        </TouchableNativeFeedback>
       );
     }
   };
@@ -323,7 +292,7 @@ const RegisterWoman = ({navigation}) => {
 const styles = StyleSheet.create({
   inputsContainer: {padding: 15},
   textField: {
-    borderBottomColor: colors.gray,
+    borderBottomColor: COLORS.gray,
     borderBottomWidth: 1,
     marginBottom: 10,
   },

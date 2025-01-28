@@ -1,6 +1,16 @@
 import {Notifier, NotifierComponents} from 'react-native-notifier';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+export const returnError = (error: any) => {
+  if (error?.response?.data?.message) {
+    return error.response.data.message;
+  } else if (error.message) {
+    return error.message;
+  } else {
+    return JSON.stringify(error);
+  }
+};
+
 export const toastMessage = (
   type: 'error' | 'success' | 'warn' | 'info',
   message: string,

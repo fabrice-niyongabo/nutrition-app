@@ -12,6 +12,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PushNotification from 'react-native-push-notification';
 import Axios from 'axios';
+import {COLORS} from '../../../constants/colors';
 
 const RegisterChild = ({navigation}) => {
   const [isRegistering, setIsRegistering] = useState(false);
@@ -172,7 +173,7 @@ const RegisterChild = ({navigation}) => {
         return (
           <View
             style={{
-              backgroundColor: colors.green,
+              backgroundColor: COLORS.green,
               padding: 15,
               borderRadius: 5,
               opacity: 0.7,
@@ -191,7 +192,7 @@ const RegisterChild = ({navigation}) => {
           <TouchableNativeFeedback onPress={handleRegister}>
             <View
               style={{
-                backgroundColor: colors.green,
+                backgroundColor: COLORS.green,
                 padding: 15,
                 borderRadius: 5,
               }}>
@@ -206,7 +207,7 @@ const RegisterChild = ({navigation}) => {
       return (
         <View
           style={{
-            backgroundColor: colors.green,
+            backgroundColor: COLORS.green,
             padding: 15,
             borderRadius: 5,
             opacity: 0.5,
@@ -306,7 +307,7 @@ const RegisterChild = ({navigation}) => {
 const styles = StyleSheet.create({
   inputsContainer: {padding: 15},
   textField: {
-    borderBottomColor: colors.gray,
+    borderBottomColor: COLORS.gray,
     borderBottomWidth: 1,
     marginBottom: 10,
   },

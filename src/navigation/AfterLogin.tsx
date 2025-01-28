@@ -7,9 +7,11 @@ import RegisterWoman from '../screens/afterLogin/registerWoman';
 import Profile from '../screens/afterLogin/profile';
 import EditProfile from '../screens/afterLogin/editProfile';
 import Notifications from '../screens/afterLogin/notifications';
+import ChildList from '../screens/afterLogin/lists/child';
+import WomenList from '../screens/afterLogin/lists/woman';
 
 const Stack = createNativeStackNavigator();
-export const AfterLogin = () => {
+const AfterLogin = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -77,7 +79,27 @@ export const AfterLogin = () => {
             headerStyle: {backgroundColor: COLORS.green},
           }}
         />
+        <Stack.Screen
+          name="Women"
+          component={WomenList}
+          options={{
+            title: 'Registered Women',
+            headerTintColor: 'white',
+            headerStyle: {backgroundColor: COLORS.green},
+          }}
+        />
+        <Stack.Screen
+          name="Child"
+          component={ChildList}
+          options={{
+            title: 'Registered Children',
+            headerTintColor: 'white',
+            headerStyle: {backgroundColor: COLORS.green},
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
+
+export default AfterLogin;
