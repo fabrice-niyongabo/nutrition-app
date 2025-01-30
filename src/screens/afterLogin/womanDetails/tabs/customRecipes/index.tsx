@@ -12,6 +12,7 @@ import {APP} from '../../../../../constants/app';
 import {IWoman} from '../../../../../types/women';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../../../../redux/reducers';
+import DatePicker from 'react-native-date-picker';
 
 interface IProps {
   woman: IWoman;
@@ -21,8 +22,10 @@ interface IProps {
 const CustomRecipes = (props: IProps) => {
   const {token} = useSelector((state: RootState) => state.userReducer);
   const [showModal, setShowModal] = useState(false);
+  const [date, setDate] = useState(new Date());
   const [selectedFoods, setSelectedFoods] = useState<IFoodItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [openDatePicker, setOpenDatePicker] = useState(true);
 
   const handleAddFood = (foodItem: IFoodItem) => {
     const exists = selectedFoods.find(
@@ -44,7 +47,7 @@ const CustomRecipes = (props: IProps) => {
         {
           woman_id: props.woman.id,
           pregnancy_month: props.pregnancyMonth,
-
+          consumed_at: date.toLocaleDateString(),
           meal: selectedFoods.map(item => ({
             carbs: item.food.nutrients.CHOCDF,
             fats: item.food.nutrients.FAT,
@@ -69,9 +72,24 @@ const CustomRecipes = (props: IProps) => {
       setIsSubmitting(false);
     }
   };
+
   return (
     <>
       <View style={{flex: 1, paddingTop: 10, gap: 15}}>
+        <DatePicker
+          modal
+          maximumDate={new Date()}
+          open={openDatePicker}
+          date={date}
+          onConfirm={date => {
+            setDate(date);
+            setOpenDatePicker(false);
+            handleSaveFood();
+          }}
+          onCancel={() => {
+            setOpenDatePicker(false);
+          }}
+        />
         <ScrollView style={{flexGrow: 1}}>
           {selectedFoods.map(item => (
             <View
@@ -121,7 +139,7 @@ const CustomRecipes = (props: IProps) => {
           </Pressable>
           <Pressable
             disabled={selectedFoods.length == 0}
-            onPress={handleSaveFood}
+            onPress={() => setOpenDatePicker(true)}
             style={{
               backgroundColor: COLORS.darkGreen,
               padding: 10,
