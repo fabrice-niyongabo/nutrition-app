@@ -1,4 +1,5 @@
 export interface IFoodItem {
+  calories: number;
   food: {
     foodId: string;
     uri: string;

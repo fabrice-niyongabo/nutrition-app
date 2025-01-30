@@ -31,11 +31,13 @@ const SearchFood = (props: IProps) => {
   const handleSearchFood = async () => {
     if (!keyword.trim().length) return;
     try {
+      setIsLoading(true);
       const res = await axios.get(
         `https://api.edamam.com/api/food-database/v2/parser?app_id=${APP.foodAPIAplicationID}&app_key=${APP.foodAPIApplicationKey}&ingr=${keyword}`,
       );
       setSearchResults(res.data.parsed);
     } catch (error) {
+      console.log(error);
       errorHandler(error);
     } finally {
       setIsLoading(false);

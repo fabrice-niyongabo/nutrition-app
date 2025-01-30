@@ -25,23 +25,44 @@ const CustomRecipes = (props: IProps) => {
   const [date, setDate] = useState(new Date());
   const [selectedFoods, setSelectedFoods] = useState<IFoodItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [openDatePicker, setOpenDatePicker] = useState(true);
+  const [openDatePicker, setOpenDatePicker] = useState(false);
 
-  const handleAddFood = (foodItem: IFoodItem) => {
+  const handleAddFood = async (foodItem: IFoodItem) => {
     const exists = selectedFoods.find(
       item => item.food.foodId === foodItem.food.foodId,
     );
     if (!exists) {
-      setSelectedFoods([...selectedFoods, foodItem]);
+      const calories = await getFoodNutrients(foodItem);
+      setSelectedFoods([...selectedFoods, {...foodItem, calories}]);
       setShowModal(false);
     } else {
       toastMessage('warn', 'Food item already exists!.');
     }
   };
 
+  const getFoodNutrients = async (foodItem: IFoodItem): Promise<number> => {
+    try {
+      setIsSubmitting(true);
+      const res = await axios.post(
+        `https://api.edamam.com/api/food-database/v2/nutrients?app_id=${APP.foodAPIAplicationID}&app_key=${APP.foodAPIApplicationKey}`,
+        {
+          ingredients: [{quantity: 1, foodId: foodItem.food.foodId}],
+        },
+      );
+      return res.data.calories;
+    } catch (error) {
+      console.log(error);
+      errorHandler(error);
+      return 0;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleSaveFood = async () => {
     try {
       setIsSubmitting(true);
+
       const res = await axios.post(
         APP.backendUrl + '/women/mealhistory',
         {
@@ -52,7 +73,7 @@ const CustomRecipes = (props: IProps) => {
             carbs: item.food.nutrients.CHOCDF,
             fats: item.food.nutrients.FAT,
             proteins: item.food.nutrients.PROCNT,
-            sugars: item.food.nutrients.ENERC_KCAL,
+            sugars: item.calories,
             food_category: item.food.category,
             food_image: item.food.image,
             food_name: item.food.label,
