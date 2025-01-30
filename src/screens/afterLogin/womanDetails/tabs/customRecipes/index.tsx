@@ -1,6 +1,5 @@
 import {View, Text, ScrollView, Pressable, Image} from 'react-native';
 import React, {useState} from 'react';
-import {INavigationProp} from '../../../../../types/navigation';
 import {COLORS} from '../../../../../constants/colors';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import SearchFood from './SearchFood';

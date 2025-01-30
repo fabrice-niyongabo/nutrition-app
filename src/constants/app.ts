@@ -3,6 +3,8 @@ export const APP = {
   imageUrl: 'http://192.168.128.3:4000/uploads/',
   foodAPIAplicationID: '07d50733',
   foodAPIApplicationKey: '80fcb49b500737827a9a23f7049653b9',
+  recipeAPIAplicationID: '900da95e',
+  recipeAPIApplicationKey: '40698503668e0bb3897581f4766d77f9',
 };
 
 // export const APP = {

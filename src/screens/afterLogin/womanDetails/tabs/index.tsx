@@ -16,7 +16,7 @@ const renderScene = ({
 }: any) => {
   switch (route.key) {
     case 'recipes':
-      return <Recipes navigation={navigation} />;
+      return <Recipes woman={woman} pregnancyMonth={pregnancyMonth} />;
     case 'custom':
       return (
         <CustomRecipes
