@@ -63,21 +63,39 @@ const CustomRecipes = (props: IProps) => {
     try {
       setIsSubmitting(true);
 
+      let carbs = 0;
+      let fats = 0;
+      let proteins = 0;
+      let sugars = 0;
+
+      for (let foodItem of selectedFoods) {
+        carbs += foodItem.food.nutrients.CHOCDF;
+        fats += foodItem.food.nutrients.FAT;
+        proteins += foodItem.food.nutrients.PROCNT;
+        sugars += foodItem.calories;
+      }
+
       const res = await axios.post(
         APP.backendUrl + '/women/mealhistory',
         {
           woman_id: props.woman.id,
           pregnancy_month: props.pregnancyMonth,
           consumed_at: date.toLocaleDateString(),
-          meal: selectedFoods.map(item => ({
-            carbs: item.food.nutrients.CHOCDF,
-            fats: item.food.nutrients.FAT,
-            proteins: item.food.nutrients.PROCNT,
-            sugars: item.calories,
-            food_category: item.food.category,
-            food_image: item.food.image,
-            food_name: item.food.label,
-          })),
+          carbs,
+          fats,
+          proteins,
+          sugars,
+          meal: JSON.stringify(
+            selectedFoods.map(item => ({
+              carbs: item.food.nutrients.CHOCDF,
+              fats: item.food.nutrients.FAT,
+              proteins: item.food.nutrients.PROCNT,
+              sugars: item.calories,
+              food_category: item.food.category,
+              food_image: item.food.image,
+              food_name: item.food.label,
+            })),
+          ),
         },
         {
           headers: {
