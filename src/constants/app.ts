@@ -1,6 +1,6 @@
 export const APP = {
-  backendUrl: 'http://192.168.128.3:4000/api',
-  imageUrl: 'http://192.168.128.3:4000/uploads/',
+  backendUrl: 'http://10.110.30.56:4000/api',
+  imageUrl: 'http://10.110.30.56:4000/uploads/',
   foodAPIAplicationID: '07d50733',
   foodAPIApplicationKey: '80fcb49b500737827a9a23f7049653b9',
 };

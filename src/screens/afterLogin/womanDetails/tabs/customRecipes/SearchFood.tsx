@@ -15,36 +15,13 @@ import {COLORS} from '../../../../../constants/colors';
 import {errorHandler} from '../../../../../utils/helpers';
 import axios from 'axios';
 import {APP} from '../../../../../constants/app';
-
-export interface IFoodItem {
-  food: {
-    foodId: string;
-    uri: string;
-    label: string;
-    knownAs: string;
-    nutrients: {
-      ENERC_KCAL: number;
-      PROCNT: number;
-      FAT: number;
-      CHOCDF: number;
-      FIBTG: number;
-    };
-    category: number;
-    categoryLabel: string;
-    image: string;
-  };
-  quantity: number;
-  measure: {
-    uri: string;
-    label: string;
-    weight: number;
-  };
-}
+import {IFoodItem} from '../../../../../types/food';
 
 const {width, height} = Dimensions.get('window');
 interface IProps {
   showModal: boolean;
   setShowModal: (val: boolean) => void;
+  handleAddFood: (val: IFoodItem) => void;
 }
 const SearchFood = (props: IProps) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -118,6 +95,7 @@ const SearchFood = (props: IProps) => {
               <TextInput
                 value={keyword}
                 onChangeText={text => setKeyword(text)}
+                placeholderTextColor={COLORS.gray}
                 placeholder="Search for food item"
                 style={{
                   borderColor: COLORS.gray,
@@ -150,7 +128,12 @@ const SearchFood = (props: IProps) => {
               )}
               <View style={{gap: 15, marginTop: 10}}>
                 {searchResults.map(item => (
-                  <View
+                  <Pressable
+                    onPress={() => {
+                      setKeyword('');
+                      setSearchResults([]);
+                      props.handleAddFood(item);
+                    }}
                     key={item.food.foodId}
                     style={{
                       justifyContent: 'space-between',
@@ -171,7 +154,7 @@ const SearchFood = (props: IProps) => {
                       <Text>{item.food.label}</Text>
                       <Text>Category: {item.food.category}</Text>
                     </View>
-                  </View>
+                  </Pressable>
                 ))}
               </View>
             </ScrollView>

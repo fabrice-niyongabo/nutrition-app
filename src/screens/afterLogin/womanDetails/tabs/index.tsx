@@ -5,13 +5,26 @@ import {INavigationProp} from '../../../../types/navigation';
 import Recipes from './recipes';
 import CustomRecipes from './customRecipes';
 import {COLORS} from '../../../../constants/colors';
+import {IWoman} from '../../../../types/women';
 
-const renderScene = ({route, jumpTo, navigation}: any) => {
+const renderScene = ({
+  route,
+  jumpTo,
+  navigation,
+  woman,
+  pregnancyMonth,
+}: any) => {
   switch (route.key) {
     case 'recipes':
       return <Recipes navigation={navigation} />;
     case 'custom':
-      return <CustomRecipes navigation={navigation} />;
+      return (
+        <CustomRecipes
+          // navigation={navigation}
+          woman={woman}
+          pregnancyMonth={pregnancyMonth}
+        />
+      );
     default:
       return null;
   }
@@ -47,7 +60,12 @@ const renderTabBar = (props: any) => {
   );
 };
 
-export default function Tabs({navigation}: INavigationProp) {
+interface IProps extends INavigationProp {
+  woman: IWoman;
+  pregnancyMonth: number;
+}
+
+export default function Tabs({navigation, woman, pregnancyMonth}: IProps) {
   const layout = useWindowDimensions();
 
   const [index, setIndex] = React.useState(0);
@@ -60,7 +78,9 @@ export default function Tabs({navigation}: INavigationProp) {
     <TabView
       lazy
       navigationState={{index, routes}}
-      renderScene={props => renderScene({...props, navigation})}
+      renderScene={props =>
+        renderScene({...props, navigation, woman, pregnancyMonth})
+      }
       onIndexChange={setIndex}
       initialLayout={{width: layout.width}}
       renderTabBar={renderTabBar}

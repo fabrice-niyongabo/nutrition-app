@@ -1,11 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  SafeAreaView,
-  ScrollView,
-  ActivityIndicator,
-} from 'react-native';
+import {View, Text, SafeAreaView} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {INavigationPropWithRouteRequired} from '../../../types/navigation';
 import {IWoman} from '../../../types/women';
@@ -147,7 +141,11 @@ const WomanDetails = ({
                   </View>
                 </>
               ) : (
-                <Tabs navigation={navigation} />
+                <Tabs
+                  navigation={navigation}
+                  woman={woman}
+                  pregnancyMonth={pregnancyMonth}
+                />
               )}
             </View>
           </View>
