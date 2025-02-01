@@ -12,6 +12,7 @@ import WomenList from '../screens/afterLogin/lists/woman';
 import ChildDetails from '../screens/afterLogin/childDetails';
 import Prediction from '../screens/afterLogin/Prediction';
 import WomanDetails from '../screens/afterLogin/womanDetails';
+import WomanMealPrediction from '../screens/afterLogin/womanMealPrediction';
 
 const Stack = createNativeStackNavigator();
 const AfterLogin = () => {
@@ -129,6 +130,15 @@ const AfterLogin = () => {
             headerTintColor: 'white',
             headerStyle: {backgroundColor: COLORS.green},
             headerBackVisible: false,
+          }}
+        />
+        <Stack.Screen
+          name="WomanPrediction"
+          component={WomanMealPrediction}
+          options={{
+            title: 'Woman Diabetes Predictions',
+            headerTintColor: 'white',
+            headerStyle: {backgroundColor: COLORS.green},
           }}
         />
       </Stack.Navigator>

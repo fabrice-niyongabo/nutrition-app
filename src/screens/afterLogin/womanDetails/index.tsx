@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, SafeAreaView} from 'react-native';
+import {View, Text, SafeAreaView, Pressable} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {INavigationPropWithRouteRequired} from '../../../types/navigation';
 import {IWoman} from '../../../types/women';
@@ -13,7 +13,6 @@ const WomanDetails = ({
 }: INavigationPropWithRouteRequired) => {
   const {woman} = route.params as {woman: IWoman};
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingSubmitting, setIsLoadingSubmitting] = useState(false);
   const [pregnancyMonth, setPregnancyMonth] = useState(0);
 
   const calculateMonths = (person: IWoman) => {
@@ -29,38 +28,6 @@ const WomanDetails = ({
     const month = woman.pregnancy_month + calculateMonths(woman);
     setPregnancyMonth(month);
   }, [woman]);
-
-  //   const handleRecordMeal = () => {
-  //     if (recommendations.length === 0) {
-  //       toastMessage('error', 'No recommendations found');
-  //       return;
-  //     }
-  //     if (!token) return;
-  //     setIsLoadingSubmitting(true);
-  //     // api call to record meal
-  //     Axios.post(
-  //       APP.backendUrl + '/womenFood/record',
-  //       {
-  //         woman_id: woman.id,
-  //         meals: recommendations,
-  //         pregnancy_month: woman.pregnancy_month,
-  //       },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       },
-  //     )
-  //       .then(res => {
-  //         toastMessage('error', 'Meal recorded successfully');
-  //       })
-  //       .catch(error => {
-  //         errorHandler(error);
-  //       })
-  //       .finally(() => {
-  //         setIsLoadingSubmitting(false);
-  //       });
-  //   };
 
   return (
     <SafeAreaView>
@@ -91,7 +58,17 @@ const WomanDetails = ({
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 flexDirection: 'row',
-              }}></View>
+              }}>
+              <Pressable
+                onPress={() => {
+                  navigation.navigate('WomanPrediction', {woman});
+                }}>
+                <View style={{alignItems: 'center'}}>
+                  <Icon name="history" size={30} color="white" />
+                  <Text style={{color: 'white'}}>Predictions</Text>
+                </View>
+              </Pressable>
+            </View>
           </View>
         </View>
 
