@@ -1,11 +1,12 @@
 import {View, Text, ActivityIndicator, ToastAndroid} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
+import {APP} from '../../../constants/app';
+import {COLORS} from '../../../constants/colors';
 
 const Monthly = ({child}) => {
   const [analysisData, setAnalysisData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchAnalysisData();
@@ -14,13 +15,11 @@ const Monthly = ({child}) => {
   const fetchAnalysisData = async () => {
     try {
       setLoading(true);
-      setError(null);
       const response = await axios.get(
-        backendUrl + '/predict/child-health/timely/' + child.id,
+        APP.backendUrl + '/predict/child-health/timely/' + child.id,
       );
       setAnalysisData(response.data);
     } catch (err) {
-      setError(err.message);
       ToastAndroid.show(returnError(err), ToastAndroid.SHORT);
     } finally {
       setLoading(false);
@@ -64,7 +63,7 @@ const Monthly = ({child}) => {
   if (loading) {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator size="large" color={colors.green} />
+        <ActivityIndicator size="large" color={COLORS.green} />
       </View>
     );
   }

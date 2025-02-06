@@ -10,10 +10,15 @@ import React, {useState, useEffect} from 'react';
 import {LineChart} from 'react-native-chart-kit';
 import axios from 'axios';
 import Monthly from './Monthly';
+import {INavigationPropWithRouteRequired} from '../../../types/navigation';
+import {IChild} from '../../../types/children';
+import {APP} from '../../../constants/app';
+import {returnError} from '../../../utils/helpers';
+import {COLORS} from '../../../constants/colors';
 
-const Prediction = ({route, navigation}) => {
-  const {child} = route.params;
-  const [nutritionData, setNutritionData] = useState(null);
+const Prediction = ({route, navigation}: INavigationPropWithRouteRequired) => {
+  const {child} = route.params as {child: IChild};
+  const [nutritionData, setNutritionData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -27,11 +32,11 @@ const Prediction = ({route, navigation}) => {
       setError(null);
 
       const response = await axios.get(
-        backendUrl + '/predict/child-health/' + child.id,
+        APP.backendUrl + '/predict/child-health/' + child.id,
       );
       console.log(response.data);
       setNutritionData(response.data);
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
       ToastAndroid.show(returnError(error), ToastAndroid.SHORT);
     } finally {
@@ -40,7 +45,7 @@ const Prediction = ({route, navigation}) => {
   };
 
   // Function to format date to readable format
-  const formatDate = dateString => {
+  const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       day: 'numeric',
@@ -49,34 +54,34 @@ const Prediction = ({route, navigation}) => {
   };
 
   // Function to transform API data to chart format
-  const transformDataForChart = historicalNutrition => {
+  const transformDataForChart = (historicalNutrition: any) => {
     if (!historicalNutrition || historicalNutrition.length === 0) {
       return null;
     }
 
     return {
-      labels: historicalNutrition.map(item => formatDate(item.date)),
+      labels: historicalNutrition.map((item: any) => formatDate(item.date)),
       datasets: [
         {
-          data: historicalNutrition.map(item => item.calories),
+          data: historicalNutrition.map((item: any) => item.calories),
           color: (opacity = 1) => `rgba(255, 0, 0, ${opacity})`,
           strokeWidth: 2,
           label: 'Calories',
         },
         {
-          data: historicalNutrition.map(item => item.carbs),
+          data: historicalNutrition.map((item: any) => item.carbs),
           color: (opacity = 1) => `rgba(0, 255, 0, ${opacity})`,
           strokeWidth: 2,
           label: 'Carbs',
         },
         {
-          data: historicalNutrition.map(item => item.protein),
+          data: historicalNutrition.map((item: any) => item.protein),
           color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`,
           strokeWidth: 2,
           label: 'Protein',
         },
         {
-          data: historicalNutrition.map(item => item.fats),
+          data: historicalNutrition.map((item: any) => item.fats),
           color: (opacity = 1) => `rgba(255, 165, 0, ${opacity})`,
           strokeWidth: 2,
           label: 'Fats',
@@ -110,7 +115,7 @@ const Prediction = ({route, navigation}) => {
   return (
     <View style={{flex: 1}}>
       <ScrollView>
-        {loading && <ActivityIndicator size="large" color={colors.green} />}
+        {loading && <ActivityIndicator size="large" color={COLORS.green} />}
         <Monthly child={child} />
         {chartData && (
           <>
