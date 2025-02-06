@@ -15,7 +15,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Axios from 'axios';
 import {INavigationPropWithRouteRequired} from '../../../types/navigation';
 import {IChild} from '../../../types/children';
-import {errorHandler, toastMessage} from '../../../utils/helpers';
+import {errorHandler, returnError, toastMessage} from '../../../utils/helpers';
 import {APP} from '../../../constants/app';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../../redux/reducers';
@@ -32,15 +32,6 @@ const ChildDetails = ({
   const [recommendations, setRecommendations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingSubmitting, setIsLoadingSubmitting] = useState(false);
-
-  const calculateMonths = (person: IChild) => {
-    const today = new Date();
-    let months;
-    months = (today.getFullYear() - person.year) * 12;
-    months -= person.month;
-    months += today.getMonth() + 1;
-    return months <= 0 ? 0 : months;
-  };
 
   const handleRecordMeal = () => {
     if (recommendations.length === 0) {
@@ -71,6 +62,23 @@ const ChildDetails = ({
         setIsLoadingSubmitting(false);
       });
   };
+
+  useEffect(() => {
+    Axios.get(APP.backendUrl + '/childrenFood/recommend/' + child.id, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(res => {
+        setRecommendations(res.data.recommendation);
+      })
+      .catch(error => {
+        ToastAndroid.show(returnError(error), ToastAndroid.SHORT);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
 
   return (
     <SafeAreaView>
